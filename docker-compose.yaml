@@ -1,0 +1,41 @@
+services:
+  user-service:
+    image: user-service:1.0.0
+    container_name: user-service
+    env_file:
+      - .env
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8080'
+    environment:
+      SPRING_DATASOURCE_URL: ${POSTGRES_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      user-service-postgres:
+        condition: service_healthy
+
+  user-service-postgres:
+    image: 'postgres:16.10'
+    container_name: user-service-postgres
+    env_file:
+      - .env
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - user-service-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  user-service-postgres-data:
+    name: user-service-postgres-data
