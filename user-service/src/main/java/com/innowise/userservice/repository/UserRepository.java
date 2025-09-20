@@ -2,6 +2,7 @@ package com.innowise.userservice.repository;
 
 import com.innowise.userservice.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +41,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
      *
      * @param id The ID of the user to delete.
      */
+    @Modifying
     @Query(value = "DELETE FROM users AS u WHERE u.id = :id", nativeQuery = true)
     void deleteByIdNative(Long id);
+
+
+    /**
+     * Checks whether a user with the specified email exists.
+     *
+     * @param email the email address to check for existence
+     * @return {@code true} if a user with the given email exists, {@code false} otherwise
+     */
+    boolean existsByEmail(String email);
 
 }

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,7 +71,26 @@ public class User {
      * are cascaded to the associated CardInfo entities.
      * If a user is deleted, all their cards will also be removed.
      */
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CardInfo> cardsInfo;
+    private List<CardInfo> cardsInfo = new ArrayList<>();
+
+    /**
+     * Adds a card to the user's collection and establishes the bidirectional link.
+     * @param cardInfo The CardInfo entity to add.
+     */
+    public void addCardInfo(CardInfo cardInfo) {
+        this.cardsInfo.add(cardInfo);
+        cardInfo.setUser(this);
+    }
+
+    /**
+     * Removes a card from the user's collection and breaks the bidirectional link.
+     * @param cardInfo The CardInfo entity to remove.
+     */
+    public void removeCardInfo(CardInfo cardInfo) {
+        this.cardsInfo.remove(cardInfo);
+        cardInfo.setUser(null);
+    }
 
 }

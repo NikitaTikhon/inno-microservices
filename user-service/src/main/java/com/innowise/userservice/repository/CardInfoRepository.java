@@ -2,6 +2,7 @@ package com.innowise.userservice.repository;
 
 import com.innowise.userservice.entity.CardInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +39,7 @@ public interface CardInfoRepository extends JpaRepository<CardInfo, Long> {
      *
      * @param id The ID of the card to delete.
      */
+    @Modifying
     @Query(value = "DELETE FROM card_info AS ci WHERE ci.id = :id", nativeQuery = true)
     void deleteByIdNative(Long id);
 
