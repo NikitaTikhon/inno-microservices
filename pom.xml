@@ -9,5 +9,9 @@
     <description>inno-microservices</description>
 
     <packaging>pom</packaging>
-    
+
+    <modules>
+        <module>user-service</module>
+    </modules>
+
 </project>
