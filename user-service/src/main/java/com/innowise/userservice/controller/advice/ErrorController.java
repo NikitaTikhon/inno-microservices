@@ -1,0 +1,104 @@
+package com.innowise.userservice.controller.advice;
+
+import com.innowise.userservice.dto.ErrorApiDto;
+import com.innowise.userservice.exception.CardNotFoundException;
+import com.innowise.userservice.exception.UserAlreadyExistException;
+import com.innowise.userservice.exception.UserNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * A global exception handler for the REST controllers.
+ * This class provides centralized exception handling across all controllers in the application.
+ * It catches specific exceptions and returns a consistent {@link ErrorApiDto} response.
+ */
+@RestControllerAdvice
+public class ErrorController {
+
+    /**
+     * Handles validation exceptions thrown by `@Valid` annotation.
+     * It extracts field-level validation errors and formats them into a
+     * structured error response.
+     *
+     * @param ex The {@link MethodArgumentNotValidException} that was thrown.
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a
+     * BAD_REQUEST status (400) and detailed validation errors.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorApiDto> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        Map<String, String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value",
+                        (existing, replacement) -> existing + "\n " + replacement
+                ));
+
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message("Validation Failed")
+                .path(request.getRequestURI())
+                .errors(errors)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorApiDto);
+    }
+
+    /**
+     * Handles exceptions when a requested resource (like a user or card) is not found.
+     * Catches both {@link UserNotFoundException} and {@link CardNotFoundException}.
+     *
+     * @param ex The {@link RuntimeException} (either {@link UserNotFoundException} or {@link CardNotFoundException}).
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a
+     * NOT_FOUND status (404).
+     */
+    @ExceptionHandler({UserNotFoundException.class, CardNotFoundException.class})
+    public ResponseEntity<ErrorApiDto> handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorApiDto);
+    }
+
+    /**
+     * Handles exceptions when a resource already exists, indicating a conflict.
+     * Catches the {@link UserAlreadyExistException}.
+     *
+     * @param ex The {@link RuntimeException} ({@link UserAlreadyExistException}).
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a
+     * CONFLICT status (409).
+     */
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<ErrorApiDto> handleConflictException(RuntimeException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorApiDto);
+    }
+
+}
