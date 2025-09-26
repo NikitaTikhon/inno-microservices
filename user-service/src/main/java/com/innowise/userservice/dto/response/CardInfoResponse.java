@@ -1,0 +1,30 @@
+package com.innowise.userservice.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+/**
+ * DTO for responding with CardInfo details.
+ */
+@Builder
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+public class CardInfoResponse implements Serializable {
+
+    private Long id;
+    private String number;
+    private String holder;
+    private LocalDate expirationDate;
+
+}
+
