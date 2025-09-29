@@ -1,16 +1,23 @@
 package com.innowise.userservice.controller.advice;
 
-import com.innowise.userservice.model.dto.ErrorApiDto;
 import com.innowise.userservice.exception.CardNotFoundException;
+import com.innowise.userservice.exception.NotFoundException;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
+import com.innowise.userservice.model.dto.ErrorApiDto;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -21,8 +28,33 @@ import java.util.stream.Collectors;
  * This class provides centralized exception handling across all controllers in the application.
  * It catches specific exceptions and returns a consistent {@link ErrorApiDto} response.
  */
+@Slf4j
 @RestControllerAdvice
-public class ErrorController {
+public class ErrorController extends ResponseEntityExceptionHandler {
+
+    /**
+     * Handles all other uncaught exceptions (the catch-all handler).
+     * This method ensures that every unhandled exception returns a standardized
+     * 500 Internal Server Error response.
+     *
+     * @param ex The {@link Exception} that was thrown.
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} with a 500 status and the ErrorApiDto.
+     */
+     @ExceptionHandler(Throwable.class)
+     public ResponseEntity<ErrorApiDto> handleUncaughtException(Exception ex, HttpServletRequest request) {
+         log.error(ex.getMessage(), ex);
+
+         ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                 .timestamp(LocalDateTime.now())
+                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                 .message("An unexpected error occurred")
+                 .path(request.getRequestURI())
+                 .build();
+
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorApiDto);
+     }
 
     /**
      * Handles validation exceptions thrown by `@Valid` annotation.
@@ -34,8 +66,8 @@ public class ErrorController {
      * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a
      * BAD_REQUEST status (400) and detailed validation errors.
      */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorApiDto> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -50,7 +82,7 @@ public class ErrorController {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .message("Validation Failed")
-                .path(request.getRequestURI())
+                .path(((ServletWebRequest) request).getRequest().getRequestURI())
                 .errors(errors)
                 .build();
 
@@ -66,7 +98,7 @@ public class ErrorController {
      * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a
      * NOT_FOUND status (404).
      */
-    @ExceptionHandler({UserNotFoundException.class, CardNotFoundException.class})
+    @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorApiDto> handleNotFoundException(RuntimeException ex, HttpServletRequest request) {
         ErrorApiDto errorApiDto = ErrorApiDto.builder()
                 .timestamp(LocalDateTime.now())
