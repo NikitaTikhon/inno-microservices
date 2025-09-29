@@ -1,14 +1,15 @@
 package com.innowise.userservice.service.impl;
 
-import com.innowise.userservice.model.dto.UserRequest;
-import com.innowise.userservice.model.dto.UserResponse;
-import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
 import com.innowise.userservice.mapper.UserMapper;
+import com.innowise.userservice.model.dto.UserRequest;
+import com.innowise.userservice.model.dto.UserResponse;
+import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,6 +101,14 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.deleteByIdNative(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> findAll(Pageable pageable) {
+        List<User> users = userRepository.findAll(pageable).getContent();
+
+        return userMapper.usersToUsersResponse(users);
     }
 
 }

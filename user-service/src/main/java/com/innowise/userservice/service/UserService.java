@@ -2,6 +2,7 @@ package com.innowise.userservice.service;
 
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -63,5 +64,15 @@ public interface UserService {
      * @throws com.innowise.userservice.exception.UserNotFoundException if the user with the given ID is not found.
      */
     void deleteById(Long id);
+
+
+    /**
+     * Finds a list of Users.
+     *
+     * @param pageable specifies the pagination (page number, page size) and
+     * sorting criteria for the query.
+     * @return A list of DTOs for the found Users.
+     */
+    List<UserResponse> findAll(Pageable pageable);
 
 }

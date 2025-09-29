@@ -5,6 +5,7 @@ import com.innowise.userservice.model.dto.UserResponse;
 import com.innowise.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,29 +57,29 @@ public class UserController {
     }
 
     /**
-     * Finds a list of users by their IDs.
+     * Retrieves a list of users based on the specified filtering criteria.
      *
-     * @param ids A list of unique user IDs.
-     * @return A {@link ResponseEntity} with a list of {@link UserResponse} objects and an HTTP status of OK (200).
+     * @param filter A string that determines the filtering logic to be applied.
+     * Defaults to "pageable" if not provided.
+     * @param ids A list of user IDs to filter by, used when {@code filter="ids"}.
+     * Optional.
+     * @param email The email address of the user to retrieve, used when {@code filter="email"}.
+     * Optional.
+     * @param pageable Pagination and sorting information, used when {@code filter="pageable"}.
+     * @return A {@link ResponseEntity} containing a {@link List} of {@link UserResponse} DTOs and an HTTP status of OK (200).
      */
     @GetMapping
-    public ResponseEntity<List<UserResponse>> findByIds(@RequestParam List<Long> ids) {
-        List<UserResponse> users = userService.findByIds(ids);
+    public ResponseEntity<List<UserResponse>> findByFilter(
+            @RequestParam(required = false, defaultValue = "pageable") String filter,
+            @RequestParam(required = false) List<Long> ids,
+            @RequestParam(required = false) String email,
+            Pageable pageable) {
 
-        return ResponseEntity.ok(users);
-    }
-
-    /**
-     * Finds a user by their email address.
-     *
-     * @param email The email address of the user.
-     * @return A {@link ResponseEntity} with the {@link UserResponse} object and an HTTP status of OK (200).
-     */
-    @GetMapping("/email/{email}")
-    public ResponseEntity<UserResponse> findByEmail(@PathVariable("email") String email) {
-        UserResponse user = userService.findByEmail(email);
-
-        return ResponseEntity.ok(user);
+        return switch (filter) {
+            case "ids" -> ResponseEntity.ok(userService.findByIds(ids));
+            case "email" -> ResponseEntity.ok(List.of(userService.findByEmail(email)));
+            default -> ResponseEntity.ok(userService.findAll(pageable));
+        };
     }
 
     /**
