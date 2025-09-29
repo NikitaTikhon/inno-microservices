@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse save(UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new UserAlreadyExistException(userRequest.getEmail());
+            throw new UserAlreadyExistException("User with email: %s already exists".formatted(userRequest.getEmail()));
         }
         User user = userMapper.userRequestToUser(userRequest);
 
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
 
         return userMapper.userToUserResponse(user);
     }
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+                .orElseThrow(() -> new UserNotFoundException("User with email: %s not found".formatted(email)));
 
         return userMapper.userToUserResponse(user);
     }
@@ -80,9 +80,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
         if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new UserAlreadyExistException(userRequest.getEmail());
+            throw new UserAlreadyExistException("User with email: %s already exists".formatted(userRequest.getEmail()));
         }
 
         userMapper.updateUserFromUserRequest(userRequest, user);
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException("User with id: %s not found".formatted(id));
         }
 
         userRepository.deleteByIdNative(id);

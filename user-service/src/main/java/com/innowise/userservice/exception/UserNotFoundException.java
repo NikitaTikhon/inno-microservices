@@ -1,16 +1,14 @@
 package com.innowise.userservice.exception;
 
-public class UserNotFoundException extends RuntimeException {
+import java.io.Serial;
 
-    private static final String USER_NOT_FOUND_BY_ID = "User with id: %s not found";
-    private static final String USER_NOT_FOUND_BY_EMAIL = "User with email: %s not found";
+public class UserNotFoundException extends NotFoundException {
 
-    public UserNotFoundException(Long id) {
-        super(USER_NOT_FOUND_BY_ID.formatted(id));
-    }
+    @Serial
+    private static final long serialVersionUID = -4689573831713216639L;
 
-    public UserNotFoundException(String email) {
-        super(USER_NOT_FOUND_BY_EMAIL.formatted(email));
+    public UserNotFoundException(String message) {
+        super(message);
     }
 
 }

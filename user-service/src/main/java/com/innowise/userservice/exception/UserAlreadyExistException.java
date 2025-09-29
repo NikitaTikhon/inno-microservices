@@ -1,11 +1,14 @@
 package com.innowise.userservice.exception;
 
+import java.io.Serial;
+
 public class UserAlreadyExistException extends RuntimeException {
 
-    private static final String USER_WITH_EMAIL_EXIST = "User with email: %s already exists";
+    @Serial
+    private static final long serialVersionUID = 8752327574034208449L;
 
-    public UserAlreadyExistException(String email) {
-        super(USER_WITH_EMAIL_EXIST.formatted(email));
+    public UserAlreadyExistException(String message) {
+        super(message);
     }
 
 }

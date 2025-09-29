@@ -1,11 +1,14 @@
 package com.innowise.userservice.exception;
 
-public class CardNotFoundException extends RuntimeException {
+import java.io.Serial;
 
-    private static final String CARD_NOT_FOUND_BY_ID = "CardInfo with id: %s not found";
+public class CardNotFoundException extends NotFoundException {
 
-    public CardNotFoundException(Long id) {
-        super(CARD_NOT_FOUND_BY_ID.formatted(id));
+    @Serial
+    private static final long serialVersionUID = 6101639314352137138L;
+
+    public CardNotFoundException(String message) {
+        super(message);
     }
 
 }
