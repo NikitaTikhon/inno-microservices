@@ -2,7 +2,6 @@ package com.innowise.userservice.service;
 
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
-import com.innowise.userservice.model.dto.UserWithCardInfoResponse;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public interface UserService {
      * @return The DTO of the found User.
      * @throws com.innowise.userservice.exception.UserNotFoundException if the user with the given ID is not found.
      */
-    UserWithCardInfoResponse findById(Long id);
+    UserResponse findById(Long id);
 
     /**
      * Finds a list of Users by a list of their IDs.

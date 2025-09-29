@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -20,6 +21,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CardInfoResponse implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -1471526800410538319L;
 
     private Long id;
     private String number;

@@ -2,7 +2,6 @@ package com.innowise.userservice.controller;
 
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
-import com.innowise.userservice.model.dto.UserWithCardInfoResponse;
 import com.innowise.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,11 +46,11 @@ public class UserController {
      * Finds a user by their unique ID and returns it along with their associated card information.
      *
      * @param id The unique ID of the user.
-     * @return A {@link ResponseEntity} with the {@link UserWithCardInfoResponse} object and an HTTP status of OK (200).
+     * @return A {@link ResponseEntity} with the {@link UserResponse} object and an HTTP status of OK (200).
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserWithCardInfoResponse> findById(@PathVariable("id") Long id) {
-        UserWithCardInfoResponse user = userService.findById(id);
+    public ResponseEntity<UserResponse> findById(@PathVariable("id") Long id) {
+        UserResponse user = userService.findById(id);
 
         return ResponseEntity.ok(user);
     }

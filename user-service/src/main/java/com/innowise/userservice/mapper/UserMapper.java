@@ -2,7 +2,6 @@ package com.innowise.userservice.mapper;
 
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
-import com.innowise.userservice.model.dto.UserWithCardInfoResponse;
 import com.innowise.userservice.model.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -21,8 +20,6 @@ public interface UserMapper {
     void updateUserFromUserRequest(UserRequest userRequest, @MappingTarget User user);
 
     UserResponse userToUserResponse(User user);
-
-    UserWithCardInfoResponse userToUserWithCardInfoResponse(User user);
 
     List<UserResponse> usersToUsersResponse(List<User> users);
 

@@ -2,7 +2,6 @@ package com.innowise.userservice.service.impl;
 
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
-import com.innowise.userservice.model.dto.UserWithCardInfoResponse;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
@@ -45,11 +44,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional(readOnly = true)
-    public UserWithCardInfoResponse findById(Long id) {
+    public UserResponse findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        return userMapper.userToUserWithCardInfoResponse(user);
+        return userMapper.userToUserResponse(user);
     }
 
     /**
@@ -82,7 +81,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
-        if (user.getEmail().equals(userRequest.getEmail())) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new UserAlreadyExistException(userRequest.getEmail());
         }
 
