@@ -1,8 +1,8 @@
 package com.innowise.userservice.mapper;
 
-import com.innowise.userservice.dto.request.CardInfoRequest;
-import com.innowise.userservice.dto.response.CardInfoResponse;
-import com.innowise.userservice.entity.CardInfo;
+import com.innowise.userservice.model.dto.CardInfoRequest;
+import com.innowise.userservice.model.dto.CardInfoResponse;
+import com.innowise.userservice.model.entity.CardInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

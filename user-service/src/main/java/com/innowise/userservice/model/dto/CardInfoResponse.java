@@ -1,4 +1,4 @@
-package com.innowise.userservice.dto.response;
+package com.innowise.userservice.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
- * DTO for responding with User details.
+ * DTO for responding with CardInfo details.
  */
 @Builder
 @Getter
@@ -19,12 +19,12 @@ import java.time.LocalDate;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse implements Serializable {
+public class CardInfoResponse implements Serializable {
 
     private Long id;
-    private String name;
-    private String surname;
-    private LocalDate birthDate;
-    private String email;
+    private String number;
+    private String holder;
+    private LocalDate expirationDate;
 
 }
+

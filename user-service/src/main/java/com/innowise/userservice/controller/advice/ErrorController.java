@@ -1,6 +1,6 @@
 package com.innowise.userservice.controller.advice;
 
-import com.innowise.userservice.dto.ErrorApiDto;
+import com.innowise.userservice.model.dto.ErrorApiDto;
 import com.innowise.userservice.exception.CardNotFoundException;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;

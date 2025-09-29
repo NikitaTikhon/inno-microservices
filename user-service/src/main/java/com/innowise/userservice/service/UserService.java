@@ -1,8 +1,8 @@
 package com.innowise.userservice.service;
 
-import com.innowise.userservice.dto.request.UserRequest;
-import com.innowise.userservice.dto.response.UserResponse;
-import com.innowise.userservice.dto.response.UserWithCardInfoResponse;
+import com.innowise.userservice.model.dto.UserRequest;
+import com.innowise.userservice.model.dto.UserResponse;
+import com.innowise.userservice.model.dto.UserWithCardInfoResponse;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.innowise.userservice.service;
 
-import com.innowise.userservice.dto.request.CardInfoRequest;
-import com.innowise.userservice.dto.response.CardInfoResponse;
+import com.innowise.userservice.model.dto.CardInfoRequest;
+import com.innowise.userservice.model.dto.CardInfoResponse;
 
 import java.util.List;
 

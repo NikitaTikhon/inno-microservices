@@ -1,4 +1,4 @@
-package com.innowise.userservice.dto.request;
+package com.innowise.userservice.model.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;

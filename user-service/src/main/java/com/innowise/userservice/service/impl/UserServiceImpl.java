@@ -1,9 +1,9 @@
 package com.innowise.userservice.service.impl;
 
-import com.innowise.userservice.dto.request.UserRequest;
-import com.innowise.userservice.dto.response.UserResponse;
-import com.innowise.userservice.dto.response.UserWithCardInfoResponse;
-import com.innowise.userservice.entity.User;
+import com.innowise.userservice.model.dto.UserRequest;
+import com.innowise.userservice.model.dto.UserResponse;
+import com.innowise.userservice.model.dto.UserWithCardInfoResponse;
+import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
 import com.innowise.userservice.mapper.UserMapper;

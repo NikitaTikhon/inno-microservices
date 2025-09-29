@@ -1,6 +1,7 @@
 package com.innowise.userservice.repository;
 
-import com.innowise.userservice.entity.User;
+
+import com.innowise.userservice.model.entity.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

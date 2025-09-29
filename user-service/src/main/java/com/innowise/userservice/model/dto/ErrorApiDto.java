@@ -1,4 +1,4 @@
-package com.innowise.userservice.dto;
+package com.innowise.userservice.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

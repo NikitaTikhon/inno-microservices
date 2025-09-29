@@ -1,7 +1,7 @@
 package com.innowise.userservice.controller;
 
-import com.innowise.userservice.dto.request.CardInfoRequest;
-import com.innowise.userservice.dto.response.CardInfoResponse;
+import com.innowise.userservice.model.dto.CardInfoRequest;
+import com.innowise.userservice.model.dto.CardInfoResponse;
 import com.innowise.userservice.service.CardInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
