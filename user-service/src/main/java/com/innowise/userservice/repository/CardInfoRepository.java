@@ -1,7 +1,6 @@
 package com.innowise.userservice.repository;
 
 import com.innowise.userservice.entity.CardInfo;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,7 @@ import java.util.List;
  * Provides standard CRUD operations and custom query methods.
  */
 @Repository
-public interface CardInfoRepository extends JpaRepository<CardInfo, Long> {
+public interface CardInfoRepository extends CrudRepository<CardInfo, Long> {
 
     /**
      * Finds a list of cards by the ID of the user they belong to.
