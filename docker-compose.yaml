@@ -10,12 +10,16 @@ services:
     ports:
       - '8081:8081'
     environment:
+      SPRING_DATA_REDIS_HOST: ${REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${REDIS_PORT}
       SPRING_DATASOURCE_URL: ${POSTGRES_URL}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       user-service-postgres:
         condition: service_healthy
+      user-service-redis:
+        condition: service_started
 
   user-service-postgres:
     image: 'postgres:16.10'
@@ -36,6 +40,31 @@ services:
     volumes:
       - user-service-postgres-data:/var/lib/postgresql/data
 
+  user-service-redis:
+    image: 'redis:7.4'
+    container_name: user-service-redis
+    env_file:
+      - .env
+    ports:
+      - '6379:6379'
+    volumes:
+      - user-service-redis-data:/var/lib/redis/data
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: proselyte-redisinsight
+    restart: always
+    depends_on:
+      - user-service-redis
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight:/data
+
 volumes:
   user-service-postgres-data:
     name: user-service-postgres-data
+  user-service-redis-data:
+    name: user-service-redis-data
+  redis-insight:
+    name: redis-insight

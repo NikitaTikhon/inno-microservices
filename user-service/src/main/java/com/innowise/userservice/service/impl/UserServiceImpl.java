@@ -9,6 +9,9 @@ import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +30,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public UserResponse save(UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
@@ -40,11 +40,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "users", key = "#id")
     public UserResponse findById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
@@ -52,9 +50,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(user);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> findByIds(List<Long> ids) {
@@ -63,9 +58,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.usersToUsersResponse(users);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly = true)
     public UserResponse findByEmail(String email) {
@@ -75,10 +67,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(user);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
+    @CachePut(cacheNames = "users", key = "#id")
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
@@ -91,10 +81,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
+    @CacheEvict(cacheNames = "users", key = "#id")
     public void deleteById(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User with id: %s not found".formatted(id));
