@@ -2,6 +2,7 @@ package com.innowise.userservice.repository;
 
 
 import com.innowise.userservice.model.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,33 @@ import java.util.Optional;
  * Provides standard CRUD operations and custom query methods.
  */
 @Repository
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    /**
+     * Saves a given user.
+     *
+     * @param user The user to save.
+     * @return The saved user.
+     */
+    @Override
+    User save(User user);
+
+    /**
+     * Retrieves a user by its ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return An {@link Optional} containing the user entity with the given ID, or {@link Optional#empty()} if not found.
+     */
+    @Override
+    Optional<User> findById(Long id);
+
+    /**
+     * Deletes the user with the given ID.
+     *
+     * @param id The ID of the user to delete.
+     */
+    @Override
+    void deleteById(Long id);
 
     /**
      * Finds a user by their email address.
