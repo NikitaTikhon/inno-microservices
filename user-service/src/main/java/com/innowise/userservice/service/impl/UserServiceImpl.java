@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
+        if (userRepository.existsByEmail(userRequest.getEmail()) && !user.getEmail().equals(userRequest.getEmail())) {
             throw new UserAlreadyExistException("User with email: %s already exists".formatted(userRequest.getEmail()));
         }
 
