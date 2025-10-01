@@ -23,7 +23,6 @@ import java.util.List;
  * Handles CRUD operations and interaction with the UserRepository.
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -31,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public UserResponse save(UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new UserAlreadyExistException("User with email: %s already exists".formatted(userRequest.getEmail()));
@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     @CachePut(cacheNames = "users", key = "#id")
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id)
@@ -82,13 +83,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     @CacheEvict(cacheNames = "users", key = "#id")
     public void deleteById(Long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User with id: %s not found".formatted(id));
         }
 
-        userRepository.deleteByIdNative(id);
+        userRepository.deleteById(id);
     }
 
     @Override

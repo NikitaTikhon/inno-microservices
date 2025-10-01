@@ -3,7 +3,6 @@ package com.innowise.userservice.repository;
 
 import com.innowise.userservice.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -60,18 +59,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT u FROM User u WHERE u.id IN :ids")
     List<User> findByIdIn(List<Long> ids);
-
-    /**
-     * Deletes a user by ID using a native SQL query.
-     * Note: This method is less preferred than using the built-in JpaRepository.deleteById()
-     * because the latter is more portable and automatically handles cascading.
-     *
-     * @param id The ID of the user to delete.
-     */
-    @Modifying
-    @Query(value = "DELETE FROM users AS u WHERE u.id = :id", nativeQuery = true)
-    void deleteByIdNative(Long id);
-
 
     /**
      * Checks whether a user with the specified email exists.

@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CardInfoServiceImpl implements CardInfoService {
 
@@ -29,6 +28,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     private final CardInfoMapper cardInfoMapper;
 
     @Override
+    @Transactional
     @CacheEvict(cacheNames = "users", key = "#cardInfoRequest.userId")
     public CardInfoResponse save(CardInfoRequest cardInfoRequest) {
         User user = userRepository.findById(cardInfoRequest.getUserId())
@@ -58,6 +58,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     @Override
+    @Transactional
     @CacheEvict(cacheNames = "users", key = "#cardInfoRequest.userId")
     public CardInfoResponse updateById(Long id, CardInfoRequest cardInfoRequest) {
         CardInfo cardInfo = cardInfoRepository.findById(id)
@@ -69,13 +70,14 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         CardInfo cardInfo = cardInfoRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException("CardInfo with id: %s not found".formatted(id)));
 
         cacheService.evictUser(cardInfo.getUser().getId());
 
-        cardInfoRepository.deleteByIdNative(id);
+        cardInfoRepository.deleteById(id);
     }
 
 }

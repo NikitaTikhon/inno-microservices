@@ -2,7 +2,6 @@ package com.innowise.userservice.repository;
 
 import com.innowise.userservice.model.entity.CardInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -59,15 +58,5 @@ public interface CardInfoRepository extends JpaRepository<CardInfo, Long> {
      */
     @Query("SELECT ci FROM CardInfo ci WHERE ci.id IN :ids")
     List<CardInfo> findByIdIn(List<Long> ids);
-
-    /**
-     * Deletes a card by ID using a native SQL query.
-     * Note: This method is less preferred than using the built-in JpaRepository.deleteById().
-     *
-     * @param id The ID of the card to delete.
-     */
-    @Modifying
-    @Query(value = "DELETE FROM card_info AS ci WHERE ci.id = :id", nativeQuery = true)
-    void deleteByIdNative(Long id);
 
 }
