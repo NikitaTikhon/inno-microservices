@@ -1,4 +1,4 @@
-package com.innowise.userservice.controller.advice;
+package com.innowise.userservice.controller;
 
 import com.innowise.userservice.exception.CardNotFoundException;
 import com.innowise.userservice.exception.NotFoundException;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestControllerAdvice
-public class ErrorController extends ResponseEntityExceptionHandler {
+public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Handles all other uncaught exceptions (the catch-all handler).
