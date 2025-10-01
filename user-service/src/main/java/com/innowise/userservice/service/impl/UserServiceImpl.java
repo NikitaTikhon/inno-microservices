@@ -8,6 +8,7 @@ import com.innowise.userservice.model.dto.UserResponse;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.service.UserService;
+import com.innowise.userservice.util.ExceptionMessageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse save(UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new UserAlreadyExistException("User with email: %s already exists".formatted(userRequest.getEmail()));
+            throw new UserAlreadyExistException(ExceptionMessageGenerator.userExist(userRequest.getEmail()));
         }
         User user = userMapper.userRequestToUser(userRequest);
 
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(cacheNames = "users", key = "#id")
     public UserResponse findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id)));
 
         return userMapper.userToUserResponse(user);
     }
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User with email: %s not found".formatted(email)));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(email)));
 
         return userMapper.userToUserResponse(user);
     }
@@ -72,9 +73,9 @@ public class UserServiceImpl implements UserService {
     @CachePut(cacheNames = "users", key = "#id")
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(id)));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id)));
         if (userRepository.existsByEmail(userRequest.getEmail()) && !user.getEmail().equals(userRequest.getEmail())) {
-            throw new UserAlreadyExistException("User with email: %s already exists".formatted(userRequest.getEmail()));
+            throw new UserAlreadyExistException(ExceptionMessageGenerator.userExist(userRequest.getEmail()));
         }
 
         userMapper.updateUserFromUserRequest(userRequest, user);
@@ -87,7 +88,7 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(cacheNames = "users", key = "#id")
     public void deleteById(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User with id: %s not found".formatted(id));
+            throw new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id));
         }
 
         userRepository.deleteById(id);

@@ -11,6 +11,7 @@ import com.innowise.userservice.repository.CardInfoRepository;
 import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.service.CacheService;
 import com.innowise.userservice.service.CardInfoService;
+import com.innowise.userservice.util.ExceptionMessageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     @CacheEvict(cacheNames = "users", key = "#cardInfoRequest.userId")
     public CardInfoResponse save(CardInfoRequest cardInfoRequest) {
         User user = userRepository.findById(cardInfoRequest.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User with id: %s not found".formatted(cardInfoRequest.getUserId())));
+                .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(cardInfoRequest.getUserId())));
 
         CardInfo cardInfo = cardInfoMapper.cardInfoRequestToCardInfo(cardInfoRequest);
         user.addCardInfo(cardInfo);
@@ -44,7 +45,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     @Transactional(readOnly = true)
     public CardInfoResponse findById(Long id) {
         CardInfo cardInfo = cardInfoRepository.findById(id)
-                .orElseThrow(() -> new CardNotFoundException("CardInfo with id: %s not found".formatted(id)));
+                .orElseThrow(() -> new CardNotFoundException(ExceptionMessageGenerator.cardNotFound(id)));
 
         return cardInfoMapper.cardInfoToCardInfoResponse(cardInfo);
     }
@@ -62,7 +63,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     @CacheEvict(cacheNames = "users", key = "#cardInfoRequest.userId")
     public CardInfoResponse updateById(Long id, CardInfoRequest cardInfoRequest) {
         CardInfo cardInfo = cardInfoRepository.findById(id)
-                .orElseThrow(() -> new CardNotFoundException("CardInfo with id: %s not found".formatted(id)));
+                .orElseThrow(() -> new CardNotFoundException(ExceptionMessageGenerator.cardNotFound(id)));
 
         cardInfoMapper.updateCardInfoFromCardInfoRequest(cardInfoRequest, cardInfo);
 
@@ -73,7 +74,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     @Transactional
     public void deleteById(Long id) {
         CardInfo cardInfo = cardInfoRepository.findById(id)
-                .orElseThrow(() -> new CardNotFoundException("CardInfo with id: %s not found".formatted(id)));
+                .orElseThrow(() -> new CardNotFoundException(ExceptionMessageGenerator.cardNotFound(id)));
 
         cacheService.evictUser(cardInfo.getUser().getId());
 
