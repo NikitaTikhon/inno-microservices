@@ -1,6 +1,7 @@
 package com.innowise.userservice.controller;
 
 import com.innowise.userservice.exception.CardNotFoundException;
+import com.innowise.userservice.exception.MissingRequestParameterException;
 import com.innowise.userservice.exception.NotFoundException;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
@@ -131,6 +132,19 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorApiDto);
+    }
+
+    @ExceptionHandler(MissingRequestParameterException.class)
+    public ResponseEntity<ErrorApiDto> handleMissingRequestParameterException(RuntimeException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorApiDto);
     }
 
 }

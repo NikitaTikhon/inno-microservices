@@ -1,8 +1,10 @@
 package com.innowise.userservice.controller;
 
+import com.innowise.userservice.exception.MissingRequestParameterException;
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
 import com.innowise.userservice.service.UserService;
+import com.innowise.userservice.util.ExceptionMessageGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -76,8 +78,18 @@ public class UserController {
             Pageable pageable) {
 
         return switch (filter) {
-            case "ids" -> ResponseEntity.ok(userService.findByIds(ids));
-            case "email" -> ResponseEntity.ok(List.of(userService.findByEmail(email)));
+            case "ids" -> {
+                if (ids == null) {
+                    throw new MissingRequestParameterException(ExceptionMessageGenerator.missingRequestParameter("ids"));
+                }
+                yield ResponseEntity.ok(userService.findByIds(ids));
+            }
+            case "email" -> {
+                if (email == null) {
+                    throw new MissingRequestParameterException(ExceptionMessageGenerator.missingRequestParameter("email"));
+                }
+                yield ResponseEntity.ok(List.of(userService.findByEmail(email)));
+            }
             default -> ResponseEntity.ok(userService.findAll(pageable));
         };
     }

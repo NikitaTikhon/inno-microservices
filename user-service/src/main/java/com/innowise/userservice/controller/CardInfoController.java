@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/cards-info")
+@RequestMapping("/api/v1/cards")
 public class CardInfoController {
 
     private final CardInfoService cardInfoService;
