@@ -3,6 +3,7 @@ package com.innowise.userservice.service.impl;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
 import com.innowise.userservice.mapper.UserMapper;
+import com.innowise.userservice.model.dto.PageableFilter;
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
 import com.innowise.userservice.model.entity.User;
@@ -13,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,8 +97,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> findAll(Pageable pageable) {
-        List<User> users = userRepository.findAll(pageable).getContent();
+    public List<UserResponse> findAll(PageableFilter pageableFilter) {
+        List<User> users = userRepository.findAll(PageRequest.of(pageableFilter.getPage(), pageableFilter.getSize())).getContent();
 
         return userMapper.usersToUsersResponse(users);
     }

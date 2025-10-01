@@ -1,13 +1,13 @@
 package com.innowise.userservice.controller;
 
 import com.innowise.userservice.exception.MissingRequestParameterException;
+import com.innowise.userservice.model.dto.PageableFilter;
 import com.innowise.userservice.model.dto.UserRequest;
 import com.innowise.userservice.model.dto.UserResponse;
 import com.innowise.userservice.service.UserService;
 import com.innowise.userservice.util.ExceptionMessageGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +67,7 @@ public class UserController {
      * Optional.
      * @param email The email address of the user to retrieve, used when {@code filter="email"}.
      * Optional.
-     * @param pageable Pagination and sorting information, used when {@code filter="pageable"}.
+     * @param pageableFilter Pagination, used when {@code filter="pageable"}.
      * @return A {@link ResponseEntity} containing a {@link List} of {@link UserResponse} DTOs and an HTTP status of OK (200).
      */
     @GetMapping
@@ -75,7 +75,7 @@ public class UserController {
             @RequestParam(required = false, defaultValue = "pageable") String filter,
             @RequestParam(required = false) List<Long> ids,
             @RequestParam(required = false) String email,
-            Pageable pageable) {
+            @Valid PageableFilter pageableFilter) {
 
         return switch (filter) {
             case "ids" -> {
@@ -90,7 +90,7 @@ public class UserController {
                 }
                 yield ResponseEntity.ok(List.of(userService.findByEmail(email)));
             }
-            default -> ResponseEntity.ok(userService.findAll(pageable));
+            default -> ResponseEntity.ok(userService.findAll(pageableFilter));
         };
     }
 
