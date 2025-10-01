@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "users", key = "#id")
     public UserResponse findById(Long id) {
-        User user = userRepository.findById(id)
+        User user = userRepository.findByIdWithCards(id)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id)));
 
         return userMapper.userToUserResponse(user);
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> findByIds(List<Long> ids) {
         List<User> users = userRepository.findByIdIn(ids);
 
-        return userMapper.usersToUsersResponse(users);
+        return userMapper.usersToUsersResponseWithoutCards(users);
     }
 
     @Override
@@ -66,14 +66,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(email)));
 
-        return userMapper.userToUserResponse(user);
+        return userMapper.userToUserResponseWithoutCards(user);
     }
 
     @Override
     @Transactional
     @CachePut(cacheNames = "users", key = "#id")
     public UserResponse updateById(Long id, UserRequest userRequest) {
-        User user = userRepository.findById(id)
+        User user = userRepository.findByIdWithCards(id)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id)));
         if (userRepository.existsByEmail(userRequest.getEmail()) && !user.getEmail().equals(userRequest.getEmail())) {
             throw new UserAlreadyExistException(ExceptionMessageGenerator.userExist(userRequest.getEmail()));
@@ -98,9 +98,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> findAll(PageableFilter pageableFilter) {
-        List<User> users = userRepository.findAll(PageRequest.of(pageableFilter.getPage(), pageableFilter.getSize())).getContent();
+        List<User> users = userRepository.findAll(
+                PageRequest.of(pageableFilter.getPage(), pageableFilter.getSize())).getContent();
 
-        return userMapper.usersToUsersResponse(users);
+        return userMapper.usersToUsersResponseWithoutCards(users);
     }
 
 }

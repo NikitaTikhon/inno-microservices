@@ -17,10 +17,12 @@ import lombok.ToString;
 @NoArgsConstructor
 public class PageableFilter {
 
+    @Builder.Default
     @Max(value = 50, message = "Size cannot be more than 50")
     @Min(value = 0, message = "Size cannot be less than 0")
     private Integer size = 20;
 
+    @Builder.Default
     @Min(value = 0, message = "Page cannot be less than 0")
     private Integer page = 0;
 

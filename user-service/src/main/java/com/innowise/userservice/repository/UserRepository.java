@@ -43,6 +43,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void deleteById(Long id);
 
     /**
+     * Retrieves a user and his cards by its ID.
+     *
+     * @param id The ID of the user to retrieve.
+     * @return An {@link Optional} containing the user entity with the given ID, or {@link Optional#empty()} if not found.
+     */
+    @Query("""
+            SELECT u FROM User u
+            LEFT JOIN FETCH u.cardsInfo
+            WHERE u.id = :id
+            """)
+    Optional<User> findByIdWithCards(Long id);
+
+    /**
      * Finds a user by their email address.
      * This is a named query method.
      *
