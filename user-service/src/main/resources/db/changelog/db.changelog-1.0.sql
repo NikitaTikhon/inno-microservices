@@ -24,3 +24,4 @@ CREATE TABLE IF NOT EXISTS card_info
 --changeset mikitatsikhan:3
 CREATE INDEX IF NOT EXISTS idx_card_info_user_id ON card_info(user_id);
 CREATE INDEX IF NOT EXISTS idx_card_info_number ON card_info(number);
+CREATE INDEX IF NOT EXISTS ids_users_email ON users(email)
