@@ -8,9 +8,6 @@
     <name>inno-microservices</name>
     <description>inno-microservices</description>
 
-    <properties>
-        <sonar.organization>nikitatikhon</sonar.organization>
-    </properties>
     <packaging>pom</packaging>
 
     <modules>
