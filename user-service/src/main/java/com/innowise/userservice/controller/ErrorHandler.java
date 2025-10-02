@@ -134,6 +134,15 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorApiDto);
     }
 
+    /**
+     * Exception handler specifically for {@link MissingRequestParameterException}.
+     * This exception is typically thrown by Spring MVC when a required request parameter
+     * (e.g., from a @RequestParam or @PathVariable) is missing or cannot be converted.
+     *
+     * @param ex The thrown {@link MissingRequestParameterException} instance.
+     * @param request The current {@link HttpServletRequest} for path context.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with HTTP status 400 (Bad Request).
+     */
     @ExceptionHandler(MissingRequestParameterException.class)
     public ResponseEntity<ErrorApiDto> handleMissingRequestParameterException(RuntimeException ex, HttpServletRequest request) {
         ErrorApiDto errorApiDto = ErrorApiDto.builder()

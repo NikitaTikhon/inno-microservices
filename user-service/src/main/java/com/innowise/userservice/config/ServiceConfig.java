@@ -13,7 +13,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import java.time.Duration;
 
 /**
- * Configuration class.
+ * Configuration class for service-level beans, particularly Spring Data Redis cache configuration.
+ * Configures Redis to correctly serialize Java objects and sets default cache behavior.
  */
 @Configuration
 public class ServiceConfig {

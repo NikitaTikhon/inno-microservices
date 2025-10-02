@@ -1,5 +1,9 @@
 package com.innowise.userservice.util;
 
+/**
+ * Utility class responsible for generating formatted exception messages.
+ * Centralizes exception message strings to ensure consistency across the application.
+ */
 public class ExceptionMessageGenerator {
 
     private static final String USER_ID_NOT_FOUND = "User with id: %s not found";
