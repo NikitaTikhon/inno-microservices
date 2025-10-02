@@ -50,21 +50,8 @@ services:
     volumes:
       - user-service-redis-data:/var/lib/redis/data
 
-  redis-insight:
-    image: redis/redisinsight:latest
-    container_name: proselyte-redisinsight
-    restart: always
-    depends_on:
-      - user-service-redis
-    ports:
-      - "5540:5540"
-    volumes:
-      - redis-insight:/data
-
 volumes:
   user-service-postgres-data:
     name: user-service-postgres-data
   user-service-redis-data:
     name: user-service-redis-data
-  redis-insight:
-    name: redis-insight
