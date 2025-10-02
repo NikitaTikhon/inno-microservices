@@ -91,8 +91,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @CacheEvict(cacheNames = "users", key = "#id")
     public void deleteById(Long id) {
-        if (userRepository.existsById(id)) {
-                throw new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id));
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id));
         }
 
         userRepository.deleteById(id);
