@@ -50,8 +50,9 @@ public interface CardInfoService {
      * Deletes a CardInfo by its unique ID.
      *
      * @param id The ID of the card to delete.
+     * @return The ID of the user.
      * @throws com.innowise.userservice.exception.CardNotFoundException if the card with the given ID is not found.
      */
-    void deleteById(Long id);
+    Long deleteById(Long id);
 
 }

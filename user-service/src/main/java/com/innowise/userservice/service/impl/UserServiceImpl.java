@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "usersByEmail", key = "#email")
     public UserResponse findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(email)));
@@ -72,9 +73,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @CachePut(cacheNames = "users", key = "#id")
+    @CacheEvict(cacheNames = "usersByEmail", key = "#result.email")
     public UserResponse updateById(Long id, UserRequest userRequest) {
         User user = userRepository.findByIdWithCards(id)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id)));
+
         if (userRepository.existsByEmail(userRequest.getEmail()) && !user.getEmail().equals(userRequest.getEmail())) {
             throw new UserAlreadyExistException(ExceptionMessageGenerator.userExist(userRequest.getEmail()));
         }
@@ -88,8 +91,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @CacheEvict(cacheNames = "users", key = "#id")
     public void deleteById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id));
+        if (userRepository.existsById(id)) {
+                throw new UserNotFoundException(ExceptionMessageGenerator.userNotFound(id));
         }
 
         userRepository.deleteById(id);

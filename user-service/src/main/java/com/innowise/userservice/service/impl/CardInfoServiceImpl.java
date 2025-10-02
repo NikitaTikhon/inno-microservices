@@ -9,7 +9,6 @@ import com.innowise.userservice.model.entity.CardInfo;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.CardInfoRepository;
 import com.innowise.userservice.repository.UserRepository;
-import com.innowise.userservice.service.CacheService;
 import com.innowise.userservice.service.CardInfoService;
 import com.innowise.userservice.util.ExceptionMessageGenerator;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardInfoServiceImpl implements CardInfoService {
 
-    private final CacheService cacheService;
     private final CardInfoRepository cardInfoRepository;
     private final UserRepository userRepository;
     private final CardInfoMapper cardInfoMapper;
@@ -65,6 +63,16 @@ public class CardInfoServiceImpl implements CardInfoService {
         CardInfo cardInfo = cardInfoRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(ExceptionMessageGenerator.cardNotFound(id)));
 
+        User oldUser = cardInfo.getUser();
+        Long newUserId = cardInfoRequest.getUserId();
+        if (!oldUser.getId().equals(newUserId)) {
+            User newUser = userRepository.findById(newUserId)
+                    .orElseThrow(() -> new UserNotFoundException(ExceptionMessageGenerator.userNotFound(newUserId)));
+
+            oldUser.removeCardInfo(cardInfo);
+            newUser.addCardInfo(cardInfo);
+        }
+
         cardInfoMapper.updateCardInfoFromCardInfoRequest(cardInfoRequest, cardInfo);
 
         return cardInfoMapper.cardInfoToCardInfoResponse(cardInfoRepository.save(cardInfo));
@@ -72,13 +80,15 @@ public class CardInfoServiceImpl implements CardInfoService {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    @CacheEvict(cacheNames = "users", key = "#result")
+    public Long deleteById(Long id) {
         CardInfo cardInfo = cardInfoRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException(ExceptionMessageGenerator.cardNotFound(id)));
 
-        cacheService.evictUser(cardInfo.getUser().getId());
-
+        Long userId = cardInfo.getUser().getId();
         cardInfoRepository.deleteById(id);
+
+        return userId;
     }
 
 }

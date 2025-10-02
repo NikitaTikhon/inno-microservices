@@ -64,9 +64,7 @@ public class UserController {
      * @param filter A string that determines the filtering logic to be applied.
      * Defaults to "pageable" if not provided.
      * @param ids A list of user IDs to filter by, used when {@code filter="ids"}.
-     * Optional.
      * @param email The email address of the user to retrieve, used when {@code filter="email"}.
-     * Optional.
      * @param pageableFilter Pagination, used when {@code filter="pageable"}.
      * @return A {@link ResponseEntity} containing a {@link List} of {@link UserResponse} DTOs and an HTTP status of OK (200).
      */
