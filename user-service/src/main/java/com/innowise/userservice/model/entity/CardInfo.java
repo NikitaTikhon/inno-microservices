@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -26,7 +27,11 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "card_info")
+@Table(name = "card_info",
+        indexes = {
+                @Index(name = "idx_card_info_user_id", columnList = "user_id"),
+                @Index(name = "idx_card_info_number", columnList = "number")
+        })
 public class CardInfo {
 
     /**
