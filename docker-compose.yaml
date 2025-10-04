@@ -1,0 +1,57 @@
+services:
+  user-service:
+    image: user-service:1.0.0
+    container_name: user-service
+    env_file:
+      - .env
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+    environment:
+      SPRING_DATA_REDIS_HOST: ${USER_REDIS_HOST}
+      SPRING_DATA_REDIS_PORT: ${USER_REDIS_PORT}
+      SPRING_DATASOURCE_URL: ${USER_POSTGRES_URL}
+      SPRING_DATASOURCE_USERNAME: ${USER_POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${USER_POSTGRES_PASSWORD}
+    depends_on:
+      user-service-postgres:
+        condition: service_healthy
+      user-service-redis:
+        condition: service_started
+
+  user-service-postgres:
+    image: 'postgres:16.10'
+    container_name: user-service-postgres
+    env_file:
+      - .env
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_DB: ${USER_POSTGRES_DB}
+      POSTGRES_USER: ${USER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${USER_POSTGRES_USER} -d ${USER_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - user-service-postgres-data:/var/lib/postgresql/data
+
+  user-service-redis:
+    image: 'redis:7.4'
+    container_name: user-service-redis
+    env_file:
+      - .env
+    ports:
+      - '6379:6379'
+    volumes:
+      - user-service-redis-data:/var/lib/redis/data
+
+volumes:
+  user-service-postgres-data:
+    name: user-service-postgres-data
+  user-service-redis-data:
+    name: user-service-redis-data
