@@ -2,6 +2,7 @@ package com.innowise.userservice.integration;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -11,6 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @DataJpaTest
 @Testcontainers
+@ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BaseRepositoryIntegrationTest {
 
