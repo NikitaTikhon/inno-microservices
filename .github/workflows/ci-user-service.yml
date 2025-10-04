@@ -3,8 +3,14 @@ name: CI Pipeline
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'user-service/**'
+      - '.github/workflows/ci-user-service.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'user-service/**'
+      - '.github/workflows/ci-user-service.yml'
   workflow_dispatch:
 
 defaults:
@@ -73,7 +79,7 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NikitaTikhon_inno-microservices -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=nikitatikhon
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NikitaTikhon_inno-user-service -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=nikitatikhon
 
   docker:
     name: Artifact Creation (Docker Image)
