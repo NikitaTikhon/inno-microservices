@@ -1,0 +1,8 @@
+spring:
+  liquibase:
+    contexts: test
+
+logging:
+  level:
+    org.springframework.test: DEBUG
+    org.testcontainers: DEBUG
