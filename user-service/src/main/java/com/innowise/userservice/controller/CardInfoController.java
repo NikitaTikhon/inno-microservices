@@ -6,6 +6,7 @@ import com.innowise.userservice.service.CardInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,6 +37,7 @@ public class CardInfoController {
      * @return A {@link ResponseEntity} with the created {@link CardInfoResponse} object and an HTTP status of OK (200).
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CardInfoResponse> save(@RequestBody @Valid CardInfoRequest cardInfoRequest) {
         CardInfoResponse cardInfo = cardInfoService.save(cardInfoRequest);
 
@@ -49,6 +51,7 @@ public class CardInfoController {
      * @return A {@link ResponseEntity} with the {@link CardInfoResponse} object and an HTTP status of OK (200).
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CardInfoResponse> findById(@PathVariable Long id) {
         CardInfoResponse cardInfo = cardInfoService.findById(id);
 
@@ -62,6 +65,7 @@ public class CardInfoController {
      * @return A {@link ResponseEntity} with a list of {@link CardInfoResponse} objects and an HTTP status of OK (200).
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CardInfoResponse>> findByIds(@RequestParam List<Long> ids) {
         List<CardInfoResponse> cardsInfo = cardInfoService.findByIds(ids);
 
@@ -76,6 +80,7 @@ public class CardInfoController {
      * @return A {@link ResponseEntity} with the updated {@link CardInfoResponse} object and an HTTP status of OK (200).
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CardInfoResponse> updateById(@PathVariable("id") Long id, @RequestBody @Valid CardInfoRequest cardInfoRequest) {
         CardInfoResponse cardInfo = cardInfoService.updateById(id, cardInfoRequest);
 
@@ -89,6 +94,7 @@ public class CardInfoController {
      * @return A {@link ResponseEntity} with no body and an HTTP status of No Content (204).
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteById(@PathVariable("id") Long id) {
         cardInfoService.deleteById(id);
 
