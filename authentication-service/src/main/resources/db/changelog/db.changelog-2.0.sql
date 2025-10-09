@@ -8,7 +8,7 @@ INSERT INTO roles (name) VALUES
 --changeset mikitatsikhan:2 context:dev
 INSERT INTO users (email, password, creation_date) VALUES
 ('user@gmail.com', '$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.', CURRENT_DATE),
-('admin@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IjefVqA7ILEQsI5IIp8XqEZl9pF7d2', CURRENT_DATE),
+('admin@gmail.com', '$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8.', CURRENT_DATE),
 ('user1@gmail.com', '$2a$10$kQ8fZ4X5X5X5X5X5X5X5XOJ5fZ4X5X5X5X5X5X5X5XOJ5fZ4X5X5a', CURRENT_DATE),
 ('user2@gmail.com', '$2a$10$lR9gA6Y6Y6Y6Y6Y6Y6Y6YPK6gA6Y6Y6Y6Y6Y6Y6Y6YPK6gA6Y6Y6b', CURRENT_DATE),
 ('user3@gmail.com', '$2a$10$mS0hB7Z7Z7Z7Z7Z7Z7Z7ZQL7hB7Z7Z7Z7Z7Z7Z7Z7ZQL7hB7Z7Z7c', CURRENT_DATE),
