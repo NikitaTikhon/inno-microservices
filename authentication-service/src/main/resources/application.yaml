@@ -20,7 +20,7 @@ spring:
         format_sql: true
 
   liquibase:
-    enabled: true
+    contexts: dev
 
 security:
   jwt:
