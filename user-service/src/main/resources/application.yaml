@@ -26,3 +26,7 @@ spring:
     redis:
       host: ${LOCAL_USER_REDIS_HOST}
       port: ${LOCAL_USER_REDIS_PORT}
+
+security:
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}
