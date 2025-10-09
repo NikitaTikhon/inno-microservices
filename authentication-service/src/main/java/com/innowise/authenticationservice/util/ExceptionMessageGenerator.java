@@ -14,6 +14,7 @@ public class ExceptionMessageGenerator {
     private static final String ROLE_NOT_FOUND = "%s not found";
 
     private static final String AUTH_HEADER_WRONG = "Authorization header is wrong";
+    private static final String AUTH_HEADER_MISSING = "Authorization header is missing";
     private static final String TOKEN_INVALID = "Token is invalid";
 
     private ExceptionMessageGenerator() {}
@@ -32,6 +33,10 @@ public class ExceptionMessageGenerator {
 
     public static String authHeaderWrong() {
         return AUTH_HEADER_WRONG;
+    }
+
+    public static String authHeaderMissing() {
+        return AUTH_HEADER_MISSING;
     }
 
     public static String tokenInvalid() {

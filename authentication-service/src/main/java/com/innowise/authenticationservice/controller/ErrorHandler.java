@@ -1,5 +1,6 @@
 package com.innowise.authenticationservice.controller;
 
+import com.innowise.authenticationservice.exception.HeaderException;
 import com.innowise.authenticationservice.exception.ResourceAlreadyExistsException;
 import com.innowise.authenticationservice.exception.ResourceNotFoundException;
 import com.innowise.authenticationservice.model.dto.ErrorApiDto;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -152,6 +154,27 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorApiDto);
+    }
+
+    /**
+     * Handles header-related exceptions.
+     * Catches {@link HeaderException} when request headers are missing or malformed.
+     *
+     * @param ex The {@link RuntimeException} ({@link HeaderException}).
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a BAD_REQUEST status (400).
+     */
+    @ExceptionHandler(HeaderException.class)
+    public ResponseEntity<ErrorApiDto> handleHeaderException(RuntimeException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorApiDto);
     }
 
 }

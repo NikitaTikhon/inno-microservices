@@ -26,7 +26,8 @@ public interface TokenService {
      *
      * @param authHeader The Authorization header containing the refresh token.
      * @return The DTO containing the new access and refresh tokens.
-     * @throws org.springframework.security.authentication.BadCredentialsException if the authorization header is invalid or the user is not found.
+     * @throws com.innowise.authenticationservice.exception.HeaderException if the authorization header is invalid
+     * @throws org.springframework.security.authentication.BadCredentialsException if the user is not found.
      * @throws com.innowise.authenticationservice.exception.TokenException if the refresh token is invalid or expired.
      */
     TokenResponse refreshToken(String authHeader);
@@ -36,7 +37,7 @@ public interface TokenService {
      *
      * @param authHeader The Authorization header containing the token to validate.
      * @return The DTO containing the user's ID, email, and roles extracted from the token.
-     * @throws org.springframework.security.authentication.BadCredentialsException if the authorization header is invalid.
+     * @throws com.innowise.authenticationservice.exception.HeaderException if the authorization header is invalid.
      * @throws com.innowise.authenticationservice.exception.TokenException if the token is invalid or expired.
      */
     TokenInfoResponse validateToken(String authHeader);

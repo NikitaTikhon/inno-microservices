@@ -1,5 +1,6 @@
 package com.innowise.authenticationservice.service.impl;
 
+import com.innowise.authenticationservice.exception.HeaderException;
 import com.innowise.authenticationservice.exception.TokenException;
 import com.innowise.authenticationservice.model.dto.AuthRequest;
 import com.innowise.authenticationservice.model.dto.TokenInfoResponse;
@@ -93,8 +94,10 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private void validateAuthorizationHeader(String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
-            throw new BadCredentialsException(ExceptionMessageGenerator.authHeaderWrong());
+        if (authorizationHeader == null) {
+            throw new HeaderException(ExceptionMessageGenerator.authHeaderMissing());
+        } else if (!authorizationHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
+            throw new HeaderException(ExceptionMessageGenerator.authHeaderWrong());
         }
     }
 
