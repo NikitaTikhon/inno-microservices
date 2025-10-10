@@ -94,9 +94,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private void validateAuthorizationHeader(String authorizationHeader) {
-        if (authorizationHeader == null) {
-            throw new HeaderException(ExceptionMessageGenerator.authHeaderMissing());
-        } else if (!authorizationHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
+        if (!authorizationHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
             throw new HeaderException(ExceptionMessageGenerator.authHeaderWrong());
         }
     }

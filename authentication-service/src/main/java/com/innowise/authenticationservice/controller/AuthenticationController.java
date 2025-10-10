@@ -9,7 +9,6 @@ import com.innowise.authenticationservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -65,8 +64,8 @@ public class AuthenticationController {
      * @param authHeader The Authorization header containing the refresh token (Bearer token).
      * @return A {@link ResponseEntity} with the {@link TokenResponse} object containing new access and refresh tokens and an HTTP status of OK (200).
      */
-    @GetMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(@RequestHeader(name = AUTHORIZATION_HEADER, required = false) String authHeader) {
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refreshToken(@RequestHeader(name = AUTHORIZATION_HEADER) String authHeader) {
         TokenResponse token = tokenService.refreshToken(authHeader);
 
         return ResponseEntity.ok(token);
@@ -79,8 +78,8 @@ public class AuthenticationController {
      * @param authHeader The Authorization header containing the token to validate (Bearer token).
      * @return A {@link ResponseEntity} with the {@link TokenInfoResponse} object containing user information and an HTTP status of OK (200).
      */
-    @GetMapping("/validate")
-    public ResponseEntity<TokenInfoResponse> validateToken(@RequestHeader(name = AUTHORIZATION_HEADER, required = false) String authHeader) {
+    @PostMapping("/validate")
+    public ResponseEntity<TokenInfoResponse> validateToken(@RequestHeader(name = AUTHORIZATION_HEADER) String authHeader) {
         TokenInfoResponse tokenInfo = tokenService.validateToken(authHeader);
 
         return ResponseEntity.ok(tokenInfo);
