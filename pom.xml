@@ -12,6 +12,7 @@
 
     <modules>
         <module>user-service</module>
+        <module>authentication-service</module>
     </modules>
 
 </project>
