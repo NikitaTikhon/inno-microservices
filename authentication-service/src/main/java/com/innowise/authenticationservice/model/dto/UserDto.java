@@ -24,7 +24,7 @@ public class UserDto {
 
     private String email;
 
-    List<RoleEnum> roles;
+    private List<RoleEnum> roles;
 
     public static UserDto of(User user) {
         return UserDto.builder()
