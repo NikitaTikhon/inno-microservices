@@ -41,24 +41,26 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateAccessToken(UserDto userDto) {
-        Map<String, Object> claims = new HashMap<>();
-
-        claims.put(TOKEN_CLAIM_TYPE, TOKEN_ACCESS_TYPE);
-        claims.put(TOKEN_CLAIM_USER_ID, userDto.getId());
-        claims.put(TOKEN_CLAIM_ROLES, userDto.getRoles());
+        Map<String, Object> claims = createClaims(userDto, TOKEN_ACCESS_TYPE);
 
         return generateToken(userDto, claims, accessTokenExpiration);
     }
 
     @Override
     public String generateRefreshToken(UserDto userDto) {
+        Map<String, Object> claims = createClaims(userDto, TOKEN_REFRESH_TYPE);
+
+        return generateToken(userDto, claims, refreshTokenExpiration);
+    }
+
+    private Map<String, Object> createClaims(UserDto userDto, String tokenType) {
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put(TOKEN_CLAIM_TYPE, TOKEN_REFRESH_TYPE);
+        claims.put(TOKEN_CLAIM_TYPE, tokenType);
         claims.put(TOKEN_CLAIM_USER_ID, userDto.getId());
         claims.put(TOKEN_CLAIM_ROLES, userDto.getRoles());
 
-        return generateToken(userDto, claims, refreshTokenExpiration);
+        return claims;
     }
 
     private String generateToken(UserDto userDto, Map<String, Object> claims, Long expiryTime) {
