@@ -6,6 +6,7 @@ import com.innowise.userservice.exception.MissingRequestParameterException;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
 import com.innowise.userservice.model.dto.ErrorApiDto;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -120,6 +122,44 @@ class ErrorHandlerTest {
         assertThat(response.getBody().getStatus()).isEqualTo(500);
         assertThat(response.getBody().getError()).isEqualTo("Internal Server Error");
         assertThat(response.getBody().getMessage()).isEqualTo("An unexpected error occurred");
+        assertThat(response.getBody().getPath()).isEqualTo(requestUri);
+    }
+
+    @Test
+    @DisplayName("Should handle access denied exception and return 403")
+    void handleAccessDeniedException_ShouldReturn403_WhenAccessDeniedException() {
+        String message = "Access denied";
+        String requestUri = "/api/v1/users";
+        AccessDeniedException exception = new AccessDeniedException(message);
+
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        ResponseEntity<ErrorApiDto> response = errorHandler.handleAccessDeniedException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(403);
+        assertThat(response.getBody().getError()).isEqualTo("Forbidden");
+        assertThat(response.getBody().getMessage()).isEqualTo(message);
+        assertThat(response.getBody().getPath()).isEqualTo(requestUri);
+    }
+
+    @Test
+    @DisplayName("Should handle token invalid exception and return 401")
+    void handleTokenInvalidException_ShouldReturn401_WhenTokenInvalidException() {
+        String message = "Jwt exception";
+        String requestUri = "/api/v1/users";
+        JwtException exception = new JwtException(message);
+
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        ResponseEntity<ErrorApiDto> response = errorHandler.handleTokenInvalidException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(401);
+        assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+        assertThat(response.getBody().getMessage()).isEqualTo(message);
         assertThat(response.getBody().getPath()).isEqualTo(requestUri);
     }
 
