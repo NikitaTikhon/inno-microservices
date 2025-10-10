@@ -73,13 +73,10 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
           
-      - name: Run tests with coverage
-        run: mvn clean verify
-          
-      - name: Build and analyze
+      - name: Run tests with coverage and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=nikitatikhon_inno-user-service -Dsonar.projectName="inno-user-service" -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=nikitatikhon
+        run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=nikitatikhon_inno-user-service -Dsonar.projectName="inno-user-service" -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=nikitatikhon
 
   docker:
     name: Artifact Creation (Docker Image)
