@@ -5,6 +5,7 @@ import com.innowise.authenticationservice.config.ServiceConfig;
 import com.innowise.authenticationservice.controller.AuthenticationController;
 import com.innowise.authenticationservice.exception.HeaderException;
 import com.innowise.authenticationservice.exception.ResourceAlreadyExistsException;
+import com.innowise.authenticationservice.model.RoleEnum;
 import com.innowise.authenticationservice.model.dto.AuthRequest;
 import com.innowise.authenticationservice.model.dto.TokenInfoResponse;
 import com.innowise.authenticationservice.model.dto.TokenResponse;
@@ -36,7 +37,6 @@ import static com.innowise.authenticationservice.unit.util.TestDataFactory.creat
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,7 +72,7 @@ class AuthenticationControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(TEST_USER_ID))
                 .andExpect(jsonPath("$.email").value(TEST_EMAIL))
-                .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
+                .andExpect(jsonPath("$.roles[0]").value(RoleEnum.ROLE_USER.name()));
     }
 
     @Test
@@ -173,7 +173,7 @@ class AuthenticationControllerTest {
 
         when(tokenService.refreshToken(anyString())).thenReturn(tokenResponse);
 
-        mockMvc.perform(get("/api/v1/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .header(AUTHORIZATION_HEADER, TEST_BEARER_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -183,21 +183,18 @@ class AuthenticationControllerTest {
 
     @Test
     @DisplayName("Should return 400 when refresh token is missing")
-    void refreshToken_ShouldReturnUnauthorized_WhenTokenIsMissing() throws Exception {
-        when(tokenService.refreshToken(any()))
-                .thenThrow(new HeaderException(ExceptionMessageGenerator.authHeaderMissing()));
-
-        mockMvc.perform(get("/api/v1/auth/refresh"))
+    void refreshToken_ShouldReturnBadRequest_WhenTokenIsMissing() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/refresh"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Should return 400 when refresh token is invalid")
-    void refreshToken_ShouldReturnUnauthorized_WhenTokenIsInvalid() throws Exception {
+    void refreshToken_ShouldReturnBadRequest_WhenTokenIsInvalid() throws Exception {
         when(tokenService.refreshToken(anyString()))
                 .thenThrow(new HeaderException(ExceptionMessageGenerator.authHeaderWrong()));
 
-        mockMvc.perform(get("/api/v1/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .header(AUTHORIZATION_HEADER, "Invalid Token"))
                 .andExpect(status().isBadRequest());
     }
@@ -209,32 +206,29 @@ class AuthenticationControllerTest {
 
         when(tokenService.validateToken(anyString())).thenReturn(tokenInfoResponse);
 
-        mockMvc.perform(get("/api/v1/auth/validate")
+        mockMvc.perform(post("/api/v1/auth/validate")
                         .header(AUTHORIZATION_HEADER, TEST_BEARER_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.userId").value(TEST_USER_ID))
                 .andExpect(jsonPath("$.email").value(TEST_EMAIL))
-                .andExpect(jsonPath("$.roles[0]").value("ROLE_USER"));
+                .andExpect(jsonPath("$.roles[0]").value(RoleEnum.ROLE_USER.name()));
     }
 
     @Test
     @DisplayName("Should return 400 when validation token is missing")
-    void validateToken_ShouldReturnUnauthorized_WhenTokenIsMissing() throws Exception {
-        when(tokenService.validateToken(any()))
-                .thenThrow(new HeaderException(ExceptionMessageGenerator.authHeaderMissing()));
-
-        mockMvc.perform(get("/api/v1/auth/validate"))
+    void validateToken_ShouldReturnBadRequest_WhenTokenIsMissing() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/validate"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("Should return 400 when validation token is invalid")
-    void validateToken_ShouldReturnUnauthorized_WhenTokenIsInvalid() throws Exception {
+    void validateToken_ShouldReturnBadRequest_WhenTokenIsInvalid() throws Exception {
         when(tokenService.validateToken(anyString()))
                 .thenThrow(new HeaderException(ExceptionMessageGenerator.authHeaderWrong()));
 
-        mockMvc.perform(get("/api/v1/auth/validate")
+        mockMvc.perform(post("/api/v1/auth/validate")
                         .header(AUTHORIZATION_HEADER, "Invalid Token"))
                 .andExpect(status().isBadRequest());
     }
