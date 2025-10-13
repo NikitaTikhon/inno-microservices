@@ -1,0 +1,23 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: ${LOCAL_ORDER_POSTGRES_URL}
+    username: ${LOCAL_ORDER_POSTGRES_USERNAME}
+    password: ${LOCAL_ORDER_POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    contexts: dev
