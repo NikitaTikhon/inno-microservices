@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: authentication-service
+
+  datasource:
+    url: ${LOCAL_AUTHENTICATION_POSTGRES_URL}
+    username: ${LOCAL_AUTHENTICATION_POSTGRES_USERNAME}
+    password: ${LOCAL_AUTHENTICATION_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    contexts: dev
+
+security:
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}
+    access_token_expiration: 3600000
+    refresh_token_expiration: 604800000
