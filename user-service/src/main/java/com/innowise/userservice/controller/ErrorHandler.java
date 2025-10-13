@@ -6,12 +6,14 @@ import com.innowise.userservice.exception.NotFoundException;
 import com.innowise.userservice.exception.UserAlreadyExistException;
 import com.innowise.userservice.exception.UserNotFoundException;
 import com.innowise.userservice.model.dto.ErrorApiDto;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,7 +45,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
      * @return A {@link ResponseEntity} with a 500 status and the ErrorApiDto.
      */
      @ExceptionHandler(Throwable.class)
-     public ResponseEntity<ErrorApiDto> handleUncaughtException(Exception ex, HttpServletRequest request) {
+     public ResponseEntity<ErrorApiDto> handleUncaughtException(Throwable ex, HttpServletRequest request) {
          log.error(ex.getMessage(), ex);
 
          ErrorApiDto errorApiDto = ErrorApiDto.builder()
@@ -154,6 +156,49 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorApiDto);
+    }
+
+    /**
+     * Handles access denied exceptions when a user lacks sufficient permissions.
+     * Catches {@link AccessDeniedException} thrown by Spring Security when a user
+     * tries to access a resource they don't have permission for (e.g., missing required role).
+     *
+     * @param ex The {@link RuntimeException} ({@link AccessDeniedException}).
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a FORBIDDEN status (403).
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorApiDto> handleAccessDeniedException(RuntimeException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorApiDto);
+    }
+
+    /**
+     * Handles JWT and authentication-related exceptions.
+     * Catches {@link JwtException} (token parsing/validation errors).
+     *
+     * @param ex The {@link RuntimeException} {@link JwtException}
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with an UNAUTHORIZED status (401).
+     */
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorApiDto> handleTokenInvalidException(RuntimeException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorApiDto);
     }
 
 }

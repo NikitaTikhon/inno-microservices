@@ -9,6 +9,7 @@ import com.innowise.userservice.util.ExceptionMessageGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class UserController {
      * @return A {@link ResponseEntity} with the created {@link UserResponse} object and an HTTP status of OK (200).
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> save(@RequestBody @Valid UserRequest userRequest) {
         UserResponse user = userService.save(userRequest);
 
@@ -52,6 +54,7 @@ public class UserController {
      * @return A {@link ResponseEntity} with the {@link UserResponse} object and an HTTP status of OK (200).
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserResponse> findById(@PathVariable("id") Long id) {
         UserResponse user = userService.findById(id);
 
@@ -69,6 +72,7 @@ public class UserController {
      * @return A {@link ResponseEntity} containing a {@link List} of {@link UserResponse} DTOs and an HTTP status of OK (200).
      */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> findByFilter(
             @RequestParam(required = false, defaultValue = "pageable") String filter,
             @RequestParam(required = false) List<Long> ids,
@@ -100,6 +104,7 @@ public class UserController {
      * @return A {@link ResponseEntity} with the updated {@link UserResponse} object and an HTTP status of OK (200).
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> updateById(@PathVariable("id") Long id, @RequestBody @Valid UserRequest userRequest) {
         UserResponse user = userService.updateById(id, userRequest);
 
@@ -113,6 +118,7 @@ public class UserController {
      * @return A {@link ResponseEntity} with no body and an HTTP status of No Content (204).
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteById(@PathVariable("id") Long id) {
         userService.deleteById(id);
 
