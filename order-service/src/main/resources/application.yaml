@@ -21,3 +21,10 @@ spring:
 
   liquibase:
     contexts: dev
+
+security:
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}
+
+user-service:
+  url: ${LOCAL_USER_SERVICE_URL}
