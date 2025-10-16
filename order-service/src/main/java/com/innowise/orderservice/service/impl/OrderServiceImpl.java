@@ -57,10 +57,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderResponse findById(Long userId, Long id) {
+    public OrderResponse findByIdAndUserId(Long id, Long userId) {
         UserResponse userResponse = userServiceRestClient.findUserById(userId);
 
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.orderNotFound(id)));
 
         return orderMapper.orderToOrderResponse(order, userResponse);

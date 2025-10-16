@@ -55,6 +55,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findById(Long id);
 
     /**
+     * Finds an order by its ID and user ID with eagerly loaded order items and associated items.
+     * Uses {@link EntityGraph} to optimize fetching and avoid N+1 query problem.
+     *
+     * @param id The order ID to search for.
+     * @param userId The user ID to search for.
+     * @return An {@link Optional} containing the found order with its items, or empty if not found.
+     */
+    @EntityGraph(attributePaths = {"orderItems", "orderItems.item"})
+    Optional<Order> findByIdAndUserId(Long id, Long userId);
+
+    /**
      * Finds all orders matching the given specification with pagination support.
      * Uses {@link EntityGraph} to eagerly load order items and associated items.
      *

@@ -28,12 +28,12 @@ public interface OrderService {
      * Retrieves an order by its ID for the specified user.
      * Includes user information from the User Service.
      *
-     * @param userId The ID of the user requesting the order.
      * @param id The ID of the order to retrieve.
+     * @param userId The ID of the user requesting the order.
      * @return The {@link OrderResponse} containing the order with user information.
      * @throws com.innowise.orderservice.exception.ResourceNotFoundException if the order or user is not found.
      */
-    OrderResponse findById(Long userId, Long id);
+    OrderResponse findByIdAndUserId(Long id, Long userId);
 
     /**
      * Retrieves a filtered and paginated list of orders.
