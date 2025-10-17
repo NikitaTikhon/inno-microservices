@@ -2,6 +2,7 @@ package com.innowise.orderservice.unit.controller;
 
 
 import com.innowise.orderservice.controller.ErrorHandler;
+import com.innowise.orderservice.exception.ExternalServiceException;
 import com.innowise.orderservice.exception.ResourceNotFoundException;
 import com.innowise.orderservice.model.dto.ErrorApiDto;
 import io.jsonwebtoken.JwtException;
@@ -15,8 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.net.ConnectException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,6 +106,64 @@ class ErrorHandlerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getStatus()).isEqualTo(401);
         assertThat(response.getBody().getError()).isEqualTo("Unauthorized");
+        assertThat(response.getBody().getMessage()).isEqualTo(message);
+        assertThat(response.getBody().getPath()).isEqualTo(requestUri);
+    }
+
+    @Test
+    @DisplayName("Should handle MethodArgumentTypeMismatchException and return 400")
+    void handleMethodArgumentTypeMismatch_ShouldReturn400_WhenArgumentTypeMismatch() {
+        String message = "Failed to convert value";
+        String requestUri = "/api/v1/orders/invalid";
+        MethodArgumentTypeMismatchException exception = mock(MethodArgumentTypeMismatchException.class);
+        
+        when(exception.getMessage()).thenReturn(message);
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        ResponseEntity<ErrorApiDto> response = errorHandler.handleMethodArgumentTypeMismatch(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(400);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Request");
+        assertThat(response.getBody().getMessage()).isEqualTo(message);
+        assertThat(response.getBody().getPath()).isEqualTo(requestUri);
+    }
+
+    @Test
+    @DisplayName("Should handle ResourceAccessException and return 503")
+    void handleResourceAccessException_ShouldReturn503_WhenExternalServiceUnavailable() {
+        String message = "Connection refused";
+        String requestUri = "/api/v1/orders";
+        ResourceAccessException exception = new ResourceAccessException(message, new ConnectException());
+
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        ResponseEntity<ErrorApiDto> response = errorHandler.handleResourceAccessException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(503);
+        assertThat(response.getBody().getError()).isEqualTo("Service Unavailable");
+        assertThat(response.getBody().getMessage()).isEqualTo(message);
+        assertThat(response.getBody().getPath()).isEqualTo(requestUri);
+    }
+
+    @Test
+    @DisplayName("Should handle ExternalServiceException and return 502")
+    void handleExternalServiceException_ShouldReturn502_WhenExternalServiceError() {
+        String message = "External service error";
+        String requestUri = "/api/v1/orders";
+        ExternalServiceException exception = new ExternalServiceException(message);
+
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        ResponseEntity<ErrorApiDto> response = errorHandler.handleExternalServiceException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStatus()).isEqualTo(502);
+        assertThat(response.getBody().getError()).isEqualTo("Bad Gateway");
         assertThat(response.getBody().getMessage()).isEqualTo(message);
         assertThat(response.getBody().getPath()).isEqualTo(requestUri);
     }
