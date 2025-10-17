@@ -4,6 +4,7 @@ package com.innowise.orderservice.config;
 import com.innowise.orderservice.model.AuthUser;
 import com.innowise.orderservice.model.RoleEnum;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -12,12 +13,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -45,6 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${security.jwt.secret_key}")
     private String secretKey;
 
+    private final HandlerExceptionResolver exceptionResolver;
+
+    public JwtAuthenticationFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
+        this.exceptionResolver = exceptionResolver;
+    }
+
     /**
      * Filters incoming HTTP requests to extract and validate JWT tokens.
      * <p>
@@ -69,26 +78,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
             String token = authHeader.substring(AUTHORIZATION_TOKEN_POSITION);
 
-            if (isTokenValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Long userId = extractUserId(token);
-                String email = extractEmail(token);
-                List<RoleEnum> roles = extractRoles(token);
+            try {
+                if (isTokenValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Long userId = extractUserId(token);
+                    String email = extractEmail(token);
+                    List<RoleEnum> roles = extractRoles(token);
 
-                List<SimpleGrantedAuthority> authorities = roles.stream()
-                        .map(RoleEnum::name)
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
+                    List<SimpleGrantedAuthority> authorities = roles.stream()
+                            .map(RoleEnum::name)
+                            .map(SimpleGrantedAuthority::new)
+                            .toList();
 
-                AuthUser authUser = AuthUser.builder()
-                        .id(userId)
-                        .email(email)
-                        .authorities(authorities)
-                        .build();
+                    AuthUser authUser = AuthUser.builder()
+                            .id(userId)
+                            .email(email)
+                            .authorities(authorities)
+                            .build();
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(authUser, token, authorities);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(authUser, token, authorities);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (JwtException ex) {
+                exceptionResolver.resolveException(request, response, null, ex);
+                return;
             }
         }
 

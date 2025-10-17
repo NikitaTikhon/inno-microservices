@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .build();
     }
 

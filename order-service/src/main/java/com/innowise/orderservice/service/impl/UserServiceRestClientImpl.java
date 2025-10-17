@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceRestClientImpl implements UserServiceRestClient {
 
-    @Qualifier("userServiceRestTemplate")
     private final RestTemplate userServiceRestTemplate;
 
     @Value("${user-service.url}")
@@ -54,7 +53,8 @@ public class UserServiceRestClientImpl implements UserServiceRestClient {
                 idsString
         );
 
-        return response.getBody();
+        List<UserResponse> body = response.getBody();
+        return body != null ? body : List.of();
     }
 
 }
