@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 /**
  * REST controller for managing orders.
  * Provides endpoints for creating, reading, updating, and deleting orders.
@@ -45,7 +47,7 @@ public class OrderController {
     public ResponseEntity<OrderResponse> save(@AuthenticationPrincipal AuthUser authUser, @RequestBody @Valid OrderRequest orderRequest) {
         OrderResponse order = orderService.save(authUser.getId(), orderRequest);
 
-        return ResponseEntity.ok(order);
+        return ResponseEntity.status(CREATED).body(order);
     }
 
     /**
