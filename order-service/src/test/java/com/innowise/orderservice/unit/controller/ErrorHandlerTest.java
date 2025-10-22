@@ -132,14 +132,14 @@ class ErrorHandlerTest {
 
     @Test
     @DisplayName("Should handle ResourceAccessException and return 503")
-    void handleResourceAccessException_ShouldReturn503_WhenExternalServiceUnavailable() {
+    void handleServiceUnavailableException_ShouldReturn503_WhenExternalServiceUnavailable() {
         String message = "Connection refused";
         String requestUri = "/api/v1/orders";
         ResourceAccessException exception = new ResourceAccessException(message, new ConnectException());
 
         when(request.getRequestURI()).thenReturn(requestUri);
 
-        ResponseEntity<ErrorApiDto> response = errorHandler.handleResourceAccessException(exception, request);
+        ResponseEntity<ErrorApiDto> response = errorHandler.handleServiceUnavailableException(exception, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
         assertThat(response.getBody()).isNotNull();
