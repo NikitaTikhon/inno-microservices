@@ -3,6 +3,7 @@ package com.innowise.orderservice.controller;
 import com.innowise.orderservice.exception.ExternalServiceException;
 import com.innowise.orderservice.exception.ResourceNotFoundException;
 import com.innowise.orderservice.model.dto.ErrorApiDto;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -204,17 +205,18 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handles resource access exceptions when communication with external services fails.
-     * This typically occurs when a remote service is unavailable or connection cannot be established
-     * (e.g., Connection refused, timeout).
-     * Catches {@link ResourceAccessException} thrown by RestTemplate when I/O errors occur.
+     * Handles service unavailability exceptions when external services cannot be reached.
+     * This includes both connection failures and circuit breaker protections.
+     * Catches:
+     * - {@link ResourceAccessException} - connection failures (timeout, refused, network errors)
+     * - {@link CallNotPermittedException} - circuit breaker is open due to high error rate
      *
-     * @param ex The {@link ResourceAccessException} that was thrown.
+     * @param ex The exception that was thrown.
      * @param request The current {@link HttpServletRequest}.
      * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a SERVICE_UNAVAILABLE status (503).
      */
-    @ExceptionHandler(ResourceAccessException.class)
-    public ResponseEntity<ErrorApiDto> handleResourceAccessException(ResourceAccessException ex, HttpServletRequest request) {
+    @ExceptionHandler({ResourceAccessException.class, CallNotPermittedException.class})
+    public ResponseEntity<ErrorApiDto> handleServiceUnavailableException(Exception ex, HttpServletRequest request) {
         ErrorApiDto errorApiDto = ErrorApiDto.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.SERVICE_UNAVAILABLE.value())

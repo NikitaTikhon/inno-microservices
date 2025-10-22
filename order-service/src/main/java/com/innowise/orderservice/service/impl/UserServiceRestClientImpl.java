@@ -2,7 +2,7 @@ package com.innowise.orderservice.service.impl;
 
 import com.innowise.orderservice.model.dto.UserResponse;
 import com.innowise.orderservice.service.UserServiceRestClient;
-import lombok.extern.slf4j.Slf4j;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class UserServiceRestClientImpl implements UserServiceRestClient {
 
     private final RestTemplate userServiceRestTemplate;
@@ -29,6 +28,7 @@ public class UserServiceRestClientImpl implements UserServiceRestClient {
     }
 
     @Override
+    @CircuitBreaker(name = "user-service")
     public UserResponse findUserById(Long userId) {
         return userServiceRestTemplate.getForObject(
                 userServiceUrl + "/users/{userId}",
@@ -38,6 +38,7 @@ public class UserServiceRestClientImpl implements UserServiceRestClient {
     }
 
     @Override
+    @CircuitBreaker(name = "user-service")
     public List<UserResponse> findUsersByIds(Set<Long> userIds) {
         String idsString = userIds.stream()
                 .map(String::valueOf)

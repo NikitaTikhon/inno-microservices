@@ -22,6 +22,25 @@ spring:
   liquibase:
     contexts: dev
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 5
+        waitDurationInOpenState: 30000
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        recordExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - com.innowise.orderservice.exception.ExternalServiceException
+        ignoreExceptions:
+          - com.innowise.orderservice.exception.ResourceNotFoundException
+          - org.springframework.security.access.AccessDeniedException
+          - java.lang.IllegalArgumentException
+
 security:
   jwt:
     secret_key: ${JWT_SECRET_KEY}
