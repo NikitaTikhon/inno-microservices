@@ -1,0 +1,49 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: ${LOCAL_ORDER_POSTGRES_URL}
+    username: ${LOCAL_ORDER_POSTGRES_USERNAME}
+    password: ${LOCAL_ORDER_POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    contexts: dev
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 5
+        waitDurationInOpenState: 30000
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        recordExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - com.innowise.orderservice.exception.ExternalServiceException
+        ignoreExceptions:
+          - com.innowise.orderservice.exception.ResourceNotFoundException
+          - org.springframework.security.access.AccessDeniedException
+          - java.lang.IllegalArgumentException
+
+security:
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}
+
+user-service:
+  url: ${LOCAL_USER_SERVICE_URL}

@@ -87,6 +87,44 @@ services:
     volumes:
       - authentication-service-postgres-data:/var/lib/postgresql/data
 
+  order-service:
+    image: order-service:1.0.0
+    container_name: order-service
+    env_file:
+      - .env
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    ports:
+      - '8083:8083'
+    environment:
+      SPRING_DATASOURCE_URL: ${ORDER_POSTGRES_URL}
+      SPRING_DATASOURCE_USERNAME: ${ORDER_POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
+      USER-SERVICE_URL: ${USER_SERVICE_URL}
+    depends_on:
+      order-service-postgres:
+        condition: service_healthy
+
+  order-service-postgres:
+    image: 'postgres:16.10'
+    container_name: order-service-postgres
+    env_file:
+      - .env
+    ports:
+      - '5435:5432'
+    environment:
+      POSTGRES_DB: ${ORDER_POSTGRES_DB}
+      POSTGRES_USER: ${ORDER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${ORDER_POSTGRES_USER} -d ${ORDER_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - order-service-postgres-data:/var/lib/postgresql/data
+
 volumes:
   user-service-postgres-data:
     name: user-service-postgres-data
@@ -94,3 +132,5 @@ volumes:
     name: user-service-redis-data
   authentication-service-postgres-data:
     name: authentication-service-postgres-data
+  order-service-postgres-data:
+    name: order-service-postgres-data
