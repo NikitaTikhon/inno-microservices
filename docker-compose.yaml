@@ -125,6 +125,28 @@ services:
     volumes:
       - order-service-postgres-data:/var/lib/postgresql/data
 
+  gateway-service:
+    image: gateway-service:1.0.0
+    container_name: gateway-service
+    env_file:
+      - .env
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - '8084:8084'
+    environment:
+      SERVICES_USER-SERVICE_URI: ${USER_SERVICE_URI}
+      SERVICES_AUTHENTICATION-SERVICE_URI: ${AUTHENTICATION_SERVICE_URI}
+      SERVICES_ORDER-SERVICE_URI: ${ORDER_SERVICE_URI}
+    depends_on:
+      user-service:
+        condition: service_started
+      authentication-service:
+        condition: service_started
+      order-service:
+        condition: service_started
+
 volumes:
   user-service-postgres-data:
     name: user-service-postgres-data

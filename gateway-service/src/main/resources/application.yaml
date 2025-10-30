@@ -1,0 +1,18 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: gateway-service
+
+services:
+  user-service:
+    uri: ${LOCAL_USER_SERVICE_URI}
+  authentication-service:
+    uri: ${LOCAL_AUTHENTICATION_SERVICE_URI}
+  order-service:
+    uri: ${LOCAL_ORDER_SERVICE_URI}
+
+security:
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}
