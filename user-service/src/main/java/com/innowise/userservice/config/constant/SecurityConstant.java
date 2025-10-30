@@ -5,6 +5,7 @@ public class SecurityConstant {
     private SecurityConstant() {}
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String INTERNAL_SERVICE_API_KEY_HEADER = "X-Internal-API-Key";
     public static final String AUTHORIZATION_BEARER_PREFIX = "Bearer ";
     public static final int AUTHORIZATION_TOKEN_POSITION = 7;
 

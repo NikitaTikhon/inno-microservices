@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,6 +28,7 @@ import java.util.function.Function;
 import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
 import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
 import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
+import static com.innowise.userservice.config.constant.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
 import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
 import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
 
@@ -42,6 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${security.jwt.secret_key}")
     private String secretKey;
+
+    @Value("${security.internal.api.key}")
+    private String internalApiKey;
 
     /**
      * Filters incoming HTTP requests to extract and validate JWT tokens.
@@ -62,9 +67,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String apiKey = request.getHeader(INTERNAL_SERVICE_API_KEY_HEADER);
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
 
-        if (authHeader != null && authHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
+        if (internalApiKey.equals(apiKey) && SecurityContextHolder.getContext().getAuthentication() == null) {
+            PreAuthenticatedAuthenticationToken internalService =
+                    new PreAuthenticatedAuthenticationToken(
+                            "internal-service",
+                            null,
+                            List.of(new SimpleGrantedAuthority("INTERNAL_SERVICE"))
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(internalService);
+        } else if (authHeader != null && authHeader.startsWith(AUTHORIZATION_BEARER_PREFIX)) {
             String token = authHeader.substring(AUTHORIZATION_TOKEN_POSITION);
 
             if (isTokenValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
