@@ -52,6 +52,7 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
         
         registry.add("security.jwt.secret_key", () -> "dGVzdC1qd3Qtc2VjcmV0LWtleS1mb3ItaW50ZWdyYXRpb24tdGVzdHMtbWluaW11bS0yNTYtYml0cy1sb25n");
+        registry.add("security.internal.api.key", () -> "test-internal-api-key");
     }
 
     @Configuration

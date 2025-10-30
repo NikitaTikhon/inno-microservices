@@ -30,10 +30,12 @@ import java.util.List;
 
 import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
 import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.userservice.config.constant.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
 import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
 import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,7 +63,10 @@ class JwtAuthenticationFilterTest {
         jwtAuthenticationFilter = new JwtAuthenticationFilter();
         String encodedKey = Base64.getUrlEncoder().encodeToString(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
         ReflectionTestUtils.setField(jwtAuthenticationFilter, "secretKey", encodedKey);
+        ReflectionTestUtils.setField(jwtAuthenticationFilter, "internalApiKey", "test-internal-api-key");
         SecurityContextHolder.clearContext();
+        
+        lenient().when(request.getHeader(INTERNAL_SERVICE_API_KEY_HEADER)).thenReturn(null);
     }
 
     @AfterEach
@@ -88,6 +93,24 @@ class JwtAuthenticationFilterTest {
         assertThat(authUser.getAuthorities())
                 .extracting("authority")
                 .containsExactlyInAnyOrder(RoleEnum.ROLE_USER.name(), RoleEnum.ROLE_ADMIN.name());
+
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("Should set authentication when valid internal API key is provided")
+    void doFilterInternal_WithValidInternalApiKey_ShouldSetAuthentication() throws ServletException, IOException {
+        when(request.getHeader(INTERNAL_SERVICE_API_KEY_HEADER)).thenReturn("test-internal-api-key");
+        when(request.getHeader(AUTHORIZATION_HEADER)).thenReturn(null);
+
+        jwtAuthenticationFilter.doFilter(request, response, filterChain);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        assertThat(authentication).isNotNull();
+        assertThat(authentication.getPrincipal()).isEqualTo("internal-service");
+        assertThat(authentication.getAuthorities())
+                .extracting("authority")
+                .containsExactly("INTERNAL_SERVICE");
 
         verify(filterChain).doFilter(request, response);
     }
