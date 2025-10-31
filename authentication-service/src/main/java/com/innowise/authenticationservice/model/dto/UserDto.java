@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Builder
@@ -21,9 +22,10 @@ import java.util.List;
 public class UserDto {
 
     private Long id;
-
+    private String name;
+    private String surname;
+    private LocalDate birthDate;
     private String email;
-
     private List<RoleEnum> roles;
 
     public static UserDto of(User user) {

@@ -1,6 +1,7 @@
 package com.innowise.authenticationservice.controller;
 
 import com.innowise.authenticationservice.model.dto.AuthRequest;
+import com.innowise.authenticationservice.model.dto.RegistrationRequest;
 import com.innowise.authenticationservice.model.dto.TokenInfoResponse;
 import com.innowise.authenticationservice.model.dto.TokenResponse;
 import com.innowise.authenticationservice.model.dto.UserDto;
@@ -33,12 +34,12 @@ public class AuthenticationController {
      * Registers a new user in the system.
      * The password is hashed using BCrypt before storing.
      *
-     * @param authRequest The {@link AuthRequest} object containing the user's email and password.
+     * @param registrationRequest The {@link RegistrationRequest} object containing the user's email and password.
      * @return A {@link ResponseEntity} with the created {@link UserDto} object and an HTTP status of OK (200).
      */
     @PostMapping("/registration")
-    public ResponseEntity<UserDto> saveUser(@RequestBody @Valid AuthRequest authRequest) {
-        UserDto user = userService.save(authRequest);
+    public ResponseEntity<UserDto> saveUser(@RequestBody @Valid RegistrationRequest registrationRequest) {
+        UserDto user = userService.save(registrationRequest);
 
         return ResponseEntity.ok(user);
     }

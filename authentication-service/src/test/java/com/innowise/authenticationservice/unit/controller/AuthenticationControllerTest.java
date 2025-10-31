@@ -1,12 +1,14 @@
 package com.innowise.authenticationservice.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.innowise.authenticationservice.config.RestClientResponseErrorHandler;
 import com.innowise.authenticationservice.config.ServiceConfig;
 import com.innowise.authenticationservice.controller.AuthenticationController;
 import com.innowise.authenticationservice.exception.HeaderException;
 import com.innowise.authenticationservice.exception.ResourceAlreadyExistsException;
 import com.innowise.authenticationservice.model.RoleEnum;
 import com.innowise.authenticationservice.model.dto.AuthRequest;
+import com.innowise.authenticationservice.model.dto.RegistrationRequest;
 import com.innowise.authenticationservice.model.dto.TokenInfoResponse;
 import com.innowise.authenticationservice.model.dto.TokenResponse;
 import com.innowise.authenticationservice.model.dto.UserDto;
@@ -31,6 +33,7 @@ import static com.innowise.authenticationservice.unit.util.TestDataFactory.TEST_
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.TEST_REFRESH_TOKEN;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.TEST_USER_ID;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.createAuthRequest;
+import static com.innowise.authenticationservice.unit.util.TestDataFactory.createRegistrationRequest;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.createTokenInfoResponse;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.createTokenResponse;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.createUserDto;
@@ -53,6 +56,8 @@ class AuthenticationControllerTest {
     private UserService userService;
     @MockitoBean
     private TokenService tokenService;
+    @MockitoBean
+    private RestClientResponseErrorHandler restClientResponseErrorHandler;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -60,14 +65,14 @@ class AuthenticationControllerTest {
     @Test
     @DisplayName("Should register new user successfully")
     void saveUser_ShouldCreateUser_WhenValidRequest() throws Exception {
-        AuthRequest authRequest = createAuthRequest();
+        RegistrationRequest registrationRequest = createRegistrationRequest();
         UserDto userDto = createUserDto();
 
-        when(userService.save(any(AuthRequest.class))).thenReturn(userDto);
+        when(userService.save(any(RegistrationRequest.class))).thenReturn(userDto);
 
         mockMvc.perform(post("/api/v1/auth/registration")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authRequest)))
+                        .content(objectMapper.writeValueAsString(registrationRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(TEST_USER_ID))
@@ -111,14 +116,14 @@ class AuthenticationControllerTest {
     @Test
     @DisplayName("Should return 409 when user already exists")
     void saveUser_ShouldReturnConflict_WhenUserAlreadyExists() throws Exception {
-        AuthRequest authRequest = createAuthRequest();
+        RegistrationRequest registrationRequest = createRegistrationRequest();
 
-        when(userService.save(any(AuthRequest.class)))
+        when(userService.save(any(RegistrationRequest.class)))
                 .thenThrow(new ResourceAlreadyExistsException(ExceptionMessageGenerator.userExists(TEST_EMAIL)));
 
         mockMvc.perform(post("/api/v1/auth/registration")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authRequest)))
+                        .content(objectMapper.writeValueAsString(registrationRequest)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value(ExceptionMessageGenerator.userExists(TEST_EMAIL)));
     }
