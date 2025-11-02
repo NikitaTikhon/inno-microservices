@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_ACCESS_TYPE;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_CLAIM_TYPE;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_REFRESH_TYPE;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_ACCESS_TYPE;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_CLAIM_ROLES;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_CLAIM_TYPE;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_CLAIM_USER_ID;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_REFRESH_TYPE;
 
 @Service
 @RequiredArgsConstructor

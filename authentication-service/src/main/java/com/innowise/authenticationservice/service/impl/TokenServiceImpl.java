@@ -17,8 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
+import static com.innowise.authenticationservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.authenticationservice.config.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
 
 @Service
 @RequiredArgsConstructor

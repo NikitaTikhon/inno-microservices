@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
+import static com.innowise.authenticationservice.config.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
 
 @Service
 public class UserServiceRestClientImpl implements UserServiceRestClient {

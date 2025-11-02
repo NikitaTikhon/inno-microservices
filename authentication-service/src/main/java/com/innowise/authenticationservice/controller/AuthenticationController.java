@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.authenticationservice.config.SecurityConstant.AUTHORIZATION_HEADER;
 
 /**
  * Controller for managing authentication and authorization operations.

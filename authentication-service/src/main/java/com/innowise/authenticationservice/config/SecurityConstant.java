@@ -1,4 +1,4 @@
-package com.innowise.authenticationservice.config.constant;
+package com.innowise.authenticationservice.config;
 
 public class SecurityConstant {
 

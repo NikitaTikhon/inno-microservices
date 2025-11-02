@@ -25,7 +25,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.authenticationservice.config.SecurityConstant.AUTHORIZATION_HEADER;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.TEST_ACCESS_TOKEN;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.TEST_BEARER_TOKEN;
 import static com.innowise.authenticationservice.unit.util.TestDataFactory.TEST_EMAIL;
