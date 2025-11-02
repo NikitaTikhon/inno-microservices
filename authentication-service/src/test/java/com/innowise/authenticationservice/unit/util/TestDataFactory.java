@@ -79,16 +79,14 @@ public class TestDataFactory {
     public static TokenInfoResponse createTokenInfoResponse() {
         return TokenInfoResponse.builder()
                 .userId(TEST_USER_ID)
-                .email(TEST_EMAIL)
                 .roles(List.of(RoleEnum.ROLE_USER))
                 .build();
     }
 
 
-    public static TokenInfoResponse createTokenInfoResponse(Long userId, String email, List<RoleEnum> roles) {
+    public static TokenInfoResponse createTokenInfoResponse(Long userId, List<RoleEnum> roles) {
         return TokenInfoResponse.builder()
                 .userId(userId)
-                .email(email)
                 .roles(roles)
                 .build();
     }

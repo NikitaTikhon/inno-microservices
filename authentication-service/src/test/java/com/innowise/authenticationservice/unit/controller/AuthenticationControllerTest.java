@@ -216,7 +216,6 @@ class AuthenticationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.userId").value(TEST_USER_ID))
-                .andExpect(jsonPath("$.email").value(TEST_EMAIL))
                 .andExpect(jsonPath("$.roles[0]").value(RoleEnum.ROLE_USER.name()));
     }
 
