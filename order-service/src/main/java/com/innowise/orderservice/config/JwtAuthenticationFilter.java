@@ -28,11 +28,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
-import static com.innowise.orderservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
-import static com.innowise.orderservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
+import static com.innowise.orderservice.config.SecurityConstant.TOKEN_CLAIM_ROLES;
+import static com.innowise.orderservice.config.SecurityConstant.TOKEN_CLAIM_USER_ID;
 
 
 /**

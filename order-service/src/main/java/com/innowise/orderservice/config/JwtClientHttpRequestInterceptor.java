@@ -9,8 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_HEADER;
 
 /**
  * HTTP request interceptor that propagates JWT tokens to outgoing REST client requests.

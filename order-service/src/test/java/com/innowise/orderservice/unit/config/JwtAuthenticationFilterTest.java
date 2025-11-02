@@ -28,10 +28,10 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
-import static com.innowise.orderservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
-import static com.innowise.orderservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.orderservice.config.SecurityConstant.TOKEN_CLAIM_ROLES;
+import static com.innowise.orderservice.config.SecurityConstant.TOKEN_CLAIM_USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

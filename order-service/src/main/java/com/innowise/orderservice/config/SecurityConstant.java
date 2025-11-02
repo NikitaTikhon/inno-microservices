@@ -1,4 +1,4 @@
-package com.innowise.orderservice.config.constant;
+package com.innowise.orderservice.config;
 
 public class SecurityConstant {
 
