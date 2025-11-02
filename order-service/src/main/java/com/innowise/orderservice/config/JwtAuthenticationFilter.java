@@ -81,7 +81,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (isTokenValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
                     Long userId = extractUserId(token);
-                    String email = extractEmail(token);
                     List<RoleEnum> roles = extractRoles(token);
 
                     List<SimpleGrantedAuthority> authorities = roles.stream()
@@ -91,7 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     AuthUser authUser = AuthUser.builder()
                             .id(userId)
-                            .email(email)
                             .authorities(authorities)
                             .build();
 
@@ -159,16 +157,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get(TOKEN_CLAIM_USER_ID, Long.class));
-    }
-
-    /**
-     * Extracts the email (subject) from the JWT token.
-     *
-     * @param token The JWT token.
-     * @return The email extracted from the token.
-     */
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
     }
 
     /**

@@ -34,11 +34,6 @@ public class AuthUser implements UserDetails {
     private Long id;
 
     /**
-     * The email address of the user, used as the username.
-     */
-    private String email;
-
-    /**
      * The list of granted authorities (roles) for the user.
      */
     private List<? extends GrantedAuthority> authorities;
@@ -73,7 +68,7 @@ public class AuthUser implements UserDetails {
      */
     @Override
     public String getUsername() {
-        return this.email;
+        return "";
     }
 
 }

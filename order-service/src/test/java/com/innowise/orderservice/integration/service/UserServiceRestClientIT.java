@@ -36,7 +36,7 @@ class UserServiceRestClientIT extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        setupAuthentication(1L, "test@example.com");
+        setupAuthentication(1L);
         reset();
     }
 
