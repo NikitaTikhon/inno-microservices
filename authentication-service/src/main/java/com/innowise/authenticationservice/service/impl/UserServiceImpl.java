@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             throw new ResourceAlreadyExistsException(ExceptionMessageGenerator.userExists(registrationRequest.getEmail()));
         }
+        
         UserDto userServiceDto = UserDto.builder()
                 .name(registrationRequest.getName())
                 .surname(registrationRequest.getSurname())
@@ -47,32 +50,39 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = userServiceRestClient.save(userServiceDto);
 
-        try {
-            Role role = roleRepository.findByName(RoleEnum.ROLE_USER)
-                    .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.roleNotFound(RoleEnum.ROLE_USER)));
+        prepareRollBackSaveUserInUserService(userDto);
 
-            User user = User.builder()
-                    .id(userDto.getId())
-                    .email(userDto.getEmail())
-                    .password(passwordEncoder.encode(registrationRequest.getPassword()))
-                    .roles(List.of(role))
-                    .build();
+        Role role = roleRepository.findByName(RoleEnum.ROLE_USER)
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.roleNotFound(RoleEnum.ROLE_USER)));
 
-            userRepository.saveWithExplicitId(user);
-            userRepository.saveUserRole(user.getId(), role.getId());
+        User user = User.builder()
+                .id(userDto.getId())
+                .email(userDto.getEmail())
+                .password(passwordEncoder.encode(registrationRequest.getPassword()))
+                .roles(List.of(role))
+                .build();
 
-            userDto.setRoles(user.getRoles().stream().map(Role::getName).toList());
+        userRepository.saveWithExplicitId(user);
+        userRepository.saveUserRole(user.getId(), role.getId());
 
-            return userDto;
-        } catch (Exception e) {
-            try {
-                userServiceRestClient.deleteById(userDto.getId());
-            } catch (Exception rollbackError) {
-                log.error("CRITICAL: Rollback failed for user {}",
-                        userDto.getId(), rollbackError);
+        userDto.setRoles(user.getRoles().stream().map(Role::getName).toList());
+
+        return userDto;
+    }
+
+    private void prepareRollBackSaveUserInUserService(UserDto userDto) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status != TransactionSynchronization.STATUS_COMMITTED) {
+                    try {
+                        userServiceRestClient.deleteById(userDto.getId());
+                    } catch (Exception e) {
+                        log.error("CRITICAL: Rollback failed for user {}", userDto.getId(), e);
+                    }
+                }
             }
-            throw e;
-        }
+        });
     }
 
 }
