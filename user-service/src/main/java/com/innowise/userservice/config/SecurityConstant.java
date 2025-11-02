@@ -1,4 +1,4 @@
-package com.innowise.userservice.config.constant;
+package com.innowise.userservice.config;
 
 public class SecurityConstant {
 

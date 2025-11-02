@@ -28,11 +28,11 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
-import static com.innowise.userservice.config.constant.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
-import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
-import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
+import static com.innowise.userservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.userservice.config.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.userservice.config.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
+import static com.innowise.userservice.config.SecurityConstant.TOKEN_CLAIM_ROLES;
+import static com.innowise.userservice.config.SecurityConstant.TOKEN_CLAIM_USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.lenient;
@@ -65,7 +65,7 @@ class JwtAuthenticationFilterTest {
         ReflectionTestUtils.setField(jwtAuthenticationFilter, "secretKey", encodedKey);
         ReflectionTestUtils.setField(jwtAuthenticationFilter, "internalApiKey", "test-internal-api-key");
         SecurityContextHolder.clearContext();
-        
+
         lenient().when(request.getHeader(INTERNAL_SERVICE_API_KEY_HEADER)).thenReturn(null);
     }
 
@@ -252,4 +252,3 @@ class JwtAuthenticationFilterTest {
     }
 
 }
-

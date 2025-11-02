@@ -25,12 +25,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
-import static com.innowise.userservice.config.constant.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
-import static com.innowise.userservice.config.constant.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
-import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
-import static com.innowise.userservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
+import static com.innowise.userservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.userservice.config.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.userservice.config.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
+import static com.innowise.userservice.config.SecurityConstant.INTERNAL_SERVICE_API_KEY_HEADER;
+import static com.innowise.userservice.config.SecurityConstant.TOKEN_CLAIM_ROLES;
+import static com.innowise.userservice.config.SecurityConstant.TOKEN_CLAIM_USER_ID;
 
 /**
  * JWT authentication filter that intercepts HTTP requests to validate JWT tokens.
