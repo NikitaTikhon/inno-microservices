@@ -2,8 +2,8 @@ package com.innowise.gatewayservice.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.innowise.gatewayservice.model.dto.ErrorApiDto;
 import com.innowise.gatewayservice.model.RoleEnum;
+import com.innowise.gatewayservice.model.dto.ErrorApiDto;
 import com.innowise.gatewayservice.util.ExceptionMessageGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -72,10 +72,8 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
                 }
 
                 Long userId = extractUserId(token);
-                String email = extractEmail(token);
-                List<RoleEnum> roles = extractRoles(token);
 
-                if (userId == null || email == null || roles == null || roles.isEmpty()) {
+                if (userId == null) {
                     return onError(exchange, ExceptionMessageGenerator.tokenInvalidClaims(), HttpStatus.UNAUTHORIZED);
                 }
 
@@ -173,16 +171,6 @@ public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilter
      */
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get(TOKEN_CLAIM_USER_ID, Long.class));
-    }
-
-    /**
-     * Extracts the email (subject) from the JWT token.
-     *
-     * @param token The JWT token.
-     * @return The email extracted from the token.
-     */
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
     }
 
     /**
