@@ -36,14 +36,14 @@ import static com.innowise.gatewayservice.config.constant.SecurityConstant.TOKEN
 import static com.innowise.gatewayservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
 
 @Component
-public class JwtAuthenticationGatewayFilterFactory extends AbstractGatewayFilterFactory<JwtAuthenticationGatewayFilterFactory.Config> {
+public class JwtAuthenticationGatewayFilter extends AbstractGatewayFilterFactory<JwtAuthenticationGatewayFilter.Config> {
 
     @Value("${security.jwt.secret_key}")
     private String secretKey;
 
     private final ObjectMapper objectMapper;
 
-    public JwtAuthenticationGatewayFilterFactory(ObjectMapper objectMapper) {
+    public JwtAuthenticationGatewayFilter(ObjectMapper objectMapper) {
         super(Config.class);
         this.objectMapper = objectMapper;
     }

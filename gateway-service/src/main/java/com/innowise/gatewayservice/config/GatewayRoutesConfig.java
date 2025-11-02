@@ -24,7 +24,7 @@ public class GatewayRoutesConfig {
     @Value("${services.order-service.uri}")
     private String orderServiceUri;
 
-    private final JwtAuthenticationGatewayFilterFactory jwtAuthenticationGatewayFilterFactory;
+    private final JwtAuthenticationGatewayFilter jwtAuthenticationGatewayFilter;
 
     /**
      * Configures all gateway routes programmatically.
@@ -37,8 +37,8 @@ public class GatewayRoutesConfig {
         return builder.routes()
                 .route("user-service", r -> r
                         .path("/api/v1/users/**", "/api/v1/cards/**")
-                        .filters(f -> f.filter(jwtAuthenticationGatewayFilterFactory
-                                .apply(new JwtAuthenticationGatewayFilterFactory.Config())))
+                        .filters(f -> f.filter(jwtAuthenticationGatewayFilter
+                                .apply(new JwtAuthenticationGatewayFilter.Config())))
                         .uri(userServiceUri)
                 )
                 .route("authentication-service-no-filters", r -> r
@@ -47,14 +47,14 @@ public class GatewayRoutesConfig {
                 )
                 .route("authentication-service", r -> r
                         .path("/api/v1/auth/**")
-                        .filters(f -> f.filter(jwtAuthenticationGatewayFilterFactory
-                                .apply(new JwtAuthenticationGatewayFilterFactory.Config())))
+                        .filters(f -> f.filter(jwtAuthenticationGatewayFilter
+                                .apply(new JwtAuthenticationGatewayFilter.Config())))
                         .uri(authenticationServiceUri)
                 )
                 .route("order-service", r -> r
                         .path("/api/v1/orders/**")
-                        .filters(f -> f.filter(jwtAuthenticationGatewayFilterFactory
-                                .apply(new JwtAuthenticationGatewayFilterFactory.Config())))
+                        .filters(f -> f.filter(jwtAuthenticationGatewayFilter
+                                .apply(new JwtAuthenticationGatewayFilter.Config())))
                         .uri(orderServiceUri)
                 )
                 .build();
