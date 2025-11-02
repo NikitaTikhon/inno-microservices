@@ -1,4 +1,4 @@
-package com.innowise.gatewayservice.config.constant;
+package com.innowise.gatewayservice.config;
 
 public class SecurityConstant {
 
