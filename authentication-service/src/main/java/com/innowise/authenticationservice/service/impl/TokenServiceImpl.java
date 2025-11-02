@@ -56,9 +56,9 @@ public class TokenServiceImpl implements TokenService {
         validateAuthorizationHeader(authHeader);
 
         String token = authHeader.substring(AUTHORIZATION_TOKEN_POSITION);
-        String email = jwtService.extractEmail(token);
+        Long userId = jwtService.extractUserId(token);
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadCredentialsException(ExceptionMessageGenerator.userBadCredentials()));
 
         if (!jwtService.isRefreshTokenValid(token)) {
@@ -88,7 +88,6 @@ public class TokenServiceImpl implements TokenService {
 
         return TokenInfoResponse.builder()
                 .userId(jwtService.extractUserId(token))
-                .email(jwtService.extractEmail(token))
                 .roles(jwtService.extractRoles(token))
                 .build();
     }

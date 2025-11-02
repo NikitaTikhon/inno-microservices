@@ -20,8 +20,6 @@ public class TokenInfoResponse {
 
     private Long userId;
 
-    private String email;
-
     private List<RoleEnum> roles;
 
 }

@@ -36,14 +36,6 @@ public interface JwtService {
     Long extractUserId(String token);
 
     /**
-     * Extracts the email from the JWT token.
-     *
-     * @param token The JWT token.
-     * @return The email extracted from the token.
-     */
-    String extractEmail(String token);
-
-    /**
      * Extracts the list of roles from the JWT token.
      *
      * @param token The JWT token.
