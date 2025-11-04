@@ -18,8 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.orderservice.config.constant.SecurityConstant.AUTHORIZATION_HEADER;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.orderservice.config.SecurityConstant.AUTHORIZATION_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;

@@ -16,7 +16,7 @@ public final class SecurityUtil {
     private SecurityUtil() {
     }
 
-    public static void setupAuthentication(Long userId, String email, List<RoleEnum> roles, String jwtToken) {
+    public static void setupAuthentication(Long userId, List<RoleEnum> roles, String jwtToken) {
         List<SimpleGrantedAuthority> authorities = roles.stream()
                 .map(RoleEnum::name)
                 .map(SimpleGrantedAuthority::new)
@@ -24,7 +24,6 @@ public final class SecurityUtil {
 
         AuthUser authUser = AuthUser.builder()
                 .id(userId)
-                .email(email)
                 .authorities(authorities)
                 .build();
 
@@ -36,8 +35,8 @@ public final class SecurityUtil {
         SecurityContextHolder.setContext(securityContext);
     }
 
-    public static void setupAuthentication(Long userId, String email) {
-        setupAuthentication(userId, email, List.of(RoleEnum.ROLE_USER), "test-jwt-token");
+    public static void setupAuthentication(Long userId) {
+        setupAuthentication(userId, List.of(RoleEnum.ROLE_USER), "test-jwt-token");
     }
 
     public static void clearAuthentication() {

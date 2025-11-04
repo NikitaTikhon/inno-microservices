@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_ACCESS_TYPE;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_CLAIM_ROLES;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_CLAIM_TYPE;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_CLAIM_USER_ID;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.TOKEN_REFRESH_TYPE;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_ACCESS_TYPE;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_CLAIM_ROLES;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_CLAIM_TYPE;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_CLAIM_USER_ID;
+import static com.innowise.authenticationservice.config.SecurityConstant.TOKEN_REFRESH_TYPE;
 
 @Service
 @RequiredArgsConstructor
@@ -43,14 +43,14 @@ public class JwtServiceImpl implements JwtService {
     public String generateAccessToken(UserDto userDto) {
         Map<String, Object> claims = createClaims(userDto, TOKEN_ACCESS_TYPE);
 
-        return generateToken(userDto, claims, accessTokenExpiration);
+        return generateToken(claims, accessTokenExpiration);
     }
 
     @Override
     public String generateRefreshToken(UserDto userDto) {
         Map<String, Object> claims = createClaims(userDto, TOKEN_REFRESH_TYPE);
 
-        return generateToken(userDto, claims, refreshTokenExpiration);
+        return generateToken(claims, refreshTokenExpiration);
     }
 
     private Map<String, Object> createClaims(UserDto userDto, String tokenType) {
@@ -63,9 +63,8 @@ public class JwtServiceImpl implements JwtService {
         return claims;
     }
 
-    private String generateToken(UserDto userDto, Map<String, Object> claims, Long expiryTime) {
+    private String generateToken(Map<String, Object> claims, Long expiryTime) {
         JwtBuilder builder = Jwts.builder()
-                .subject(userDto.getEmail())
                 .issuedAt(new Date())
                 .claims(claims)
                 .expiration(new Date(System.currentTimeMillis() + expiryTime))
@@ -98,11 +97,6 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get(TOKEN_CLAIM_USER_ID, Long.class));
-    }
-
-    @Override
-    public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
     }
 
     @Override

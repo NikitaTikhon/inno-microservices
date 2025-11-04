@@ -22,8 +22,27 @@ spring:
   liquibase:
     contexts: dev
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 5
+        waitDurationInOpenState: 30000
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
 security:
   jwt:
     secret_key: ${JWT_SECRET_KEY}
     access_token_expiration: 3600000
     refresh_token_expiration: 604800000
+  internal:
+    api:
+      key: ${INTERNAL_API_KEY}
+
+services:
+  user-service:
+    uri: ${USER_SERVICE_URI}

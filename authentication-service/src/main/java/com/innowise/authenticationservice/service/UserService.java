@@ -1,6 +1,6 @@
 package com.innowise.authenticationservice.service;
 
-import com.innowise.authenticationservice.model.dto.AuthRequest;
+import com.innowise.authenticationservice.model.dto.RegistrationRequest;
 import com.innowise.authenticationservice.model.dto.UserDto;
 
 /**
@@ -13,11 +13,11 @@ public interface UserService {
      * Saves a new User based on the provided authentication request.
      * The password is hashed using BCrypt before storing.
      *
-     * @param authRequest The DTO containing the user's email and password.
+     * @param registrationRequest The DTO containing the registration info.
      * @return The DTO of the newly created User.
      * @throws com.innowise.authenticationservice.exception.ResourceAlreadyExistsException if the user with the given email already exists.
      * @throws com.innowise.authenticationservice.exception.ResourceNotFoundException if the default role is not found.
      */
-    UserDto save(AuthRequest authRequest);
+    UserDto save(RegistrationRequest registrationRequest);
 
 }

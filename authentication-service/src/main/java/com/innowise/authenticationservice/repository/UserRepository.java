@@ -2,6 +2,8 @@ package com.innowise.authenticationservice.repository;
 
 import com.innowise.authenticationservice.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -21,6 +23,31 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Override
     User save(User user);
+
+    /**
+     * Saves a user with an explicitly provided ID.
+     *
+     * @param user The user entity with the ID already set.
+     */
+    @Modifying
+    @Query(value = """
+        INSERT INTO users (id, email, password, creation_date)
+        VALUES (:#{#user.id}, :#{#user.email}, :#{#user.password}, CURRENT_DATE)
+        """, nativeQuery = true)
+    void saveWithExplicitId(User user);
+
+    /**
+     * Creates a relationship between a user and a role.
+     *
+     * @param userId The ID of the user.
+     * @param roleId The ID of the role to assign.
+     */
+    @Modifying
+    @Query(value = """
+        INSERT INTO users_roles (user_id, role_id)
+        VALUES (:userId, :roleId)
+        """, nativeQuery = true)
+    void saveUserRole(Long userId, Long roleId);
 
     /**
      * Finds a user by their email address.

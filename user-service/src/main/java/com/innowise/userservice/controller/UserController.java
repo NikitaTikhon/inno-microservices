@@ -40,7 +40,7 @@ public class UserController {
      * @return A {@link ResponseEntity} with the created {@link UserResponse} object and an HTTP status of OK (200).
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('INTERNAL_SERVICE')")
     public ResponseEntity<UserResponse> save(@RequestBody @Valid UserRequest userRequest) {
         UserResponse user = userService.save(userRequest);
 
@@ -118,7 +118,7 @@ public class UserController {
      * @return A {@link ResponseEntity} with no body and an HTTP status of No Content (204).
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('INTERNAL_SERVICE')")
     public ResponseEntity<Void> deleteById(@PathVariable("id") Long id) {
         userService.deleteById(id);
 

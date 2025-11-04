@@ -1,9 +1,11 @@
 package com.innowise.authenticationservice.controller;
 
+import com.innowise.authenticationservice.exception.ExternalServiceException;
 import com.innowise.authenticationservice.exception.HeaderException;
 import com.innowise.authenticationservice.exception.ResourceAlreadyExistsException;
 import com.innowise.authenticationservice.exception.ResourceNotFoundException;
 import com.innowise.authenticationservice.model.dto.ErrorApiDto;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -198,6 +201,53 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorApiDto);
+    }
+
+    /**
+     * Handles service unavailability exceptions when external services cannot be reached.
+     * This includes both connection failures and circuit breaker protections.
+     * Catches:
+     * - {@link ResourceAccessException} - connection failures (timeout, refused, network errors)
+     * - {@link CallNotPermittedException} - circuit breaker is open due to high error rate
+     *
+     * @param ex The exception that was thrown.
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a SERVICE_UNAVAILABLE status (503).
+     */
+    @ExceptionHandler({ResourceAccessException.class, CallNotPermittedException.class})
+    public ResponseEntity<ErrorApiDto> handleServiceUnavailableException(Exception ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                .error(HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorApiDto);
+    }
+
+    /**
+     * Handles external service exceptions when a remote service returns an error response.
+     * This typically occurs when a remote service returns an unexpected error status code
+     * (e.g., 500 Internal Server Error from external service).
+     * Catches {@link ExternalServiceException} thrown by the REST client error handler.
+     *
+     * @param ex The {@link ExternalServiceException} that was thrown.
+     * @param request The current {@link HttpServletRequest}.
+     * @return A {@link ResponseEntity} containing an {@link ErrorApiDto} with a BAD_GATEWAY status (502).
+     */
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ErrorApiDto> handleExternalServiceException(ExternalServiceException ex, HttpServletRequest request) {
+        ErrorApiDto errorApiDto = ErrorApiDto.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_GATEWAY.value())
+                .error(HttpStatus.BAD_GATEWAY.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorApiDto);
     }
 
 }

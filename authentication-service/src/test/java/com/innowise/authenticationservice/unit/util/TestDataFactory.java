@@ -2,10 +2,12 @@ package com.innowise.authenticationservice.unit.util;
 
 import com.innowise.authenticationservice.model.RoleEnum;
 import com.innowise.authenticationservice.model.dto.AuthRequest;
+import com.innowise.authenticationservice.model.dto.RegistrationRequest;
 import com.innowise.authenticationservice.model.dto.TokenInfoResponse;
 import com.innowise.authenticationservice.model.dto.TokenResponse;
 import com.innowise.authenticationservice.model.dto.UserDto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class TestDataFactory {
@@ -13,11 +15,22 @@ public class TestDataFactory {
     public static final String TEST_EMAIL = "nikita@gmail.com";
     public static final String TEST_PASSWORD = "password123";
     public static final Long TEST_USER_ID = 1L;
+    public static final String TEST_DUMB = "dumb";
     public static final String TEST_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access.token";
     public static final String TEST_REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh.token";
     public static final String TEST_BEARER_TOKEN = "Bearer " + TEST_ACCESS_TOKEN;
 
     private TestDataFactory() {}
+
+    public static RegistrationRequest createRegistrationRequest() {
+        return RegistrationRequest.builder()
+                .name(TEST_DUMB)
+                .surname(TEST_DUMB)
+                .birthDate(LocalDate.now())
+                .email(TEST_EMAIL)
+                .password(TEST_PASSWORD)
+                .build();
+    }
 
     public static AuthRequest createAuthRequest() {
         return AuthRequest.builder()
@@ -66,16 +79,14 @@ public class TestDataFactory {
     public static TokenInfoResponse createTokenInfoResponse() {
         return TokenInfoResponse.builder()
                 .userId(TEST_USER_ID)
-                .email(TEST_EMAIL)
                 .roles(List.of(RoleEnum.ROLE_USER))
                 .build();
     }
 
 
-    public static TokenInfoResponse createTokenInfoResponse(Long userId, String email, List<RoleEnum> roles) {
+    public static TokenInfoResponse createTokenInfoResponse(Long userId, List<RoleEnum> roles) {
         return TokenInfoResponse.builder()
                 .userId(userId)
-                .email(email)
                 .roles(roles)
                 .build();
     }

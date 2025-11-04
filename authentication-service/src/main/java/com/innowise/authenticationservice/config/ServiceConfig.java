@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
 
@@ -22,6 +23,8 @@ import java.security.SecureRandom;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class ServiceConfig {
+
+    private final RestClientResponseErrorHandler restClientResponseErrorHandler;
 
     /**
      * Configures the security filter chain for HTTP requests.
@@ -51,6 +54,19 @@ public class ServiceConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10, new SecureRandom());
+    }
+
+    /**
+     * Creates a configured {@link RestTemplate} bean for communication with the User Service.
+     *
+     * @return The configured {@link RestTemplate} for user service REST calls.
+     */
+    @Bean
+    public RestTemplate userServiceRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(restClientResponseErrorHandler);
+
+        return restTemplate;
     }
 
 }

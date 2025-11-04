@@ -17,8 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
-import static com.innowise.authenticationservice.config.constant.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
+import static com.innowise.authenticationservice.config.SecurityConstant.AUTHORIZATION_BEARER_PREFIX;
+import static com.innowise.authenticationservice.config.SecurityConstant.AUTHORIZATION_TOKEN_POSITION;
 
 @Service
 @RequiredArgsConstructor
@@ -56,9 +56,9 @@ public class TokenServiceImpl implements TokenService {
         validateAuthorizationHeader(authHeader);
 
         String token = authHeader.substring(AUTHORIZATION_TOKEN_POSITION);
-        String email = jwtService.extractEmail(token);
+        Long userId = jwtService.extractUserId(token);
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadCredentialsException(ExceptionMessageGenerator.userBadCredentials()));
 
         if (!jwtService.isRefreshTokenValid(token)) {
@@ -88,7 +88,6 @@ public class TokenServiceImpl implements TokenService {
 
         return TokenInfoResponse.builder()
                 .userId(jwtService.extractUserId(token))
-                .email(jwtService.extractEmail(token))
                 .roles(jwtService.extractRoles(token))
                 .build();
     }

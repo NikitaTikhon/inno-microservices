@@ -57,7 +57,7 @@ class OrderServiceIT extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        setupAuthentication(1L, "test@example.com");
+        setupAuthentication(1L);
         orderRepository.deleteAll();
         itemRepository.deleteAll();
         reset();

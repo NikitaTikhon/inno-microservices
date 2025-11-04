@@ -64,6 +64,7 @@ services:
       SPRING_DATASOURCE_URL: ${AUTHENTICATION_POSTGRES_URL}
       SPRING_DATASOURCE_USERNAME: ${AUTHENTICATION_POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${AUTHENTICATION_POSTGRES_PASSWORD}
+      SERVICES_USER-SERVICE_URI: ${DOCKER_USER_SERVICE_URI}
     depends_on:
       authentication-service-postgres:
         condition: service_healthy
@@ -124,6 +125,28 @@ services:
       retries: 5
     volumes:
       - order-service-postgres-data:/var/lib/postgresql/data
+
+  gateway-service:
+    image: gateway-service:1.0.0
+    container_name: gateway-service
+    env_file:
+      - .env
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - '8084:8084'
+    environment:
+      SERVICES_USER-SERVICE_URI: ${DOCKER_USER_SERVICE_URI}
+      SERVICES_AUTHENTICATION-SERVICE_URI: ${DOCKER_AUTHENTICATION_SERVICE_URI}
+      SERVICES_ORDER-SERVICE_URI: ${DOCKER_ORDER_SERVICE_URI}
+    depends_on:
+      user-service:
+        condition: service_started
+      authentication-service:
+        condition: service_started
+      order-service:
+        condition: service_started
 
 volumes:
   user-service-postgres-data:
