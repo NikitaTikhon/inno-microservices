@@ -7,11 +7,11 @@ spring:
 
 services:
   user-service:
-    uri: ${LOCAL_USER_SERVICE_URI}
+    uri: ${USER_SERVICE_URI}
   authentication-service:
-    uri: ${LOCAL_AUTHENTICATION_SERVICE_URI}
+    uri: ${AUTHENTICATION_SERVICE_URI}
   order-service:
-    uri: ${LOCAL_ORDER_SERVICE_URI}
+    uri: ${ORDER_SERVICE_URI}
 
 security:
   jwt:
