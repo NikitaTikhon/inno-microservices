@@ -45,4 +45,4 @@ security:
 
 services:
   user-service:
-    uri: ${LOCAL_USER_SERVICE_URI}
+    uri: ${USER_SERVICE_URI}
