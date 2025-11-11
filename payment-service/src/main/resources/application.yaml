@@ -1,0 +1,15 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: payment-service
+
+  data:
+    mongodb:
+      uri: ${LOCAL_PAYMENT_MONGODB_URL}
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.xml
+
