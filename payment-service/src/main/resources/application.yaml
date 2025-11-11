@@ -13,3 +13,7 @@ spring:
     enabled: true
     change-log: db/changelog/db.changelog-master.xml
 
+services:
+  random-number-api:
+    uri: ${RANDOM_NUMBER_API_URI}
+
