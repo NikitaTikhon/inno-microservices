@@ -103,6 +103,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${ORDER_POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
       USER-SERVICE_URL: ${USER_SERVICE_URL}
+      SPRING_KAFKA_BOOTSTRAPSERVERS: ${PAYMENT_ORDER_KAFKA_URL}
     depends_on:
       order-service-postgres:
         condition: service_healthy
