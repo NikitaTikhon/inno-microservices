@@ -61,6 +61,6 @@ public interface PaymentService {
      * @param orderId The order ID to check for.
      * @return {@code true} if a payment exists for the given order, {@code false} otherwise.
      */
-    Boolean existsByOrderId(Long orderId);
+    boolean existsByOrderId(Long orderId);
 
 }

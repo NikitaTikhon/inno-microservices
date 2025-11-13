@@ -78,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Boolean existsByOrderId(Long orderId) {
+    public boolean existsByOrderId(Long orderId) {
         return paymentRepository.existsByOrderId(orderId);
     }
 
