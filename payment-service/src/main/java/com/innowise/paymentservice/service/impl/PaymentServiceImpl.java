@@ -1,5 +1,6 @@
 package com.innowise.paymentservice.service.impl;
 
+import com.innowise.paymentservice.exception.ResourceNotFoundException;
 import com.innowise.paymentservice.mapper.PaymentMapper;
 import com.innowise.paymentservice.model.PaymentStatus;
 import com.innowise.paymentservice.model.document.Payment;
@@ -8,6 +9,7 @@ import com.innowise.paymentservice.model.dto.PaymentResponse;
 import com.innowise.paymentservice.model.projection.TotalAmountProjection;
 import com.innowise.paymentservice.repository.PaymentRepository;
 import com.innowise.paymentservice.service.PaymentService;
+import com.innowise.paymentservice.util.ExceptionMessageGenerator;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.Decimal128;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PaymentResponse> findByOrderId(Long orderId) {
-        List<Payment> payments = paymentRepository.findByOrderId(orderId);
+    public PaymentResponse findByOrderId(Long orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.paymentNotFound(orderId)));
 
-        return paymentMapper.paymentsToPaymentsResponse(payments);
+        return paymentMapper.paymentToPaymentResponse(payment);
     }
 
     @Override
@@ -71,6 +74,12 @@ public class PaymentServiceImpl implements PaymentService {
         return totalAmountOpt.map(TotalAmountProjection::getTotal)
                 .map(Decimal128::bigDecimalValue)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean existsByOrderId(Long orderId) {
+        return paymentRepository.existsByOrderId(orderId);
     }
 
 }

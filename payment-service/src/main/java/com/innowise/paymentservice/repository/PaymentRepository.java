@@ -29,12 +29,12 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
     Payment save(Payment payment);
 
     /**
-     * Retrieves all payments associated with a specific order.
+     * Retrieves payment associated with a specific order.
      *
      * @param id The order ID to search for.
-     * @return A {@link List} of payments for the given order.
+     * @return A {@link Optional} of payment for the given order.
      */
-    List<Payment> findByOrderId(Long id);
+    Optional<Payment> findByOrderId(Long id);
 
     /**
      * Retrieves all payments made by a specific user.
@@ -64,5 +64,13 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
             "{ $group: { _id: null, total: { $sum: '$payment_amount' } } }"
     })
     Optional<TotalAmountProjection> findTotalAmount(LocalDateTime from, LocalDateTime to);
+
+    /**
+     * Checks if a payment exists for the specified order.
+     *
+     * @param id The order ID to check for.
+     * @return {@code true} if a payment exists for the given order, {@code false} otherwise.
+     */
+    boolean existsByOrderId(Long id);
 
 }

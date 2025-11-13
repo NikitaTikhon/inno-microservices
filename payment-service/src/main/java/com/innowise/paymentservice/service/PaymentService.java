@@ -26,9 +26,9 @@ public interface PaymentService {
      * Retrieves all payments associated with a specific order.
      *
      * @param orderId The order ID to search for.
-     * @return A {@link List} of payments for the given order.
+     * @return payment for the given order.
      */
-    List<PaymentResponse> findByOrderId(Long orderId);
+    PaymentResponse findByOrderId(Long orderId);
 
     /**
      * Retrieves all payments made by a specific user.
@@ -54,5 +54,13 @@ public interface PaymentService {
      * @return The total amount as {@link BigDecimal}.
      */
     BigDecimal findTotalAmount(LocalDateTime from, LocalDateTime to);
+
+    /**
+     * Checks if a payment exists for the specified order.
+     *
+     * @param orderId The order ID to check for.
+     * @return {@code true} if a payment exists for the given order, {@code false} otherwise.
+     */
+    Boolean existsByOrderId(Long orderId);
 
 }
