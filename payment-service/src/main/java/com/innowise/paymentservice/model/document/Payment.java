@@ -28,7 +28,7 @@ public class Payment {
     @Id
     private ObjectId id;
 
-    @Indexed
+    @Indexed(unique = true)
     @Field("order_id")
     private Long orderId;
 

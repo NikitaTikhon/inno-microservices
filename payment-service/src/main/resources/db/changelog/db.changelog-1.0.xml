@@ -34,7 +34,7 @@
                                 "description": "User ID must be a long"
                             },
                             "status": {
-                                "enum": ["PENDING", "PROCESSING", "SUCCESS", "FAILED", "REFUNDED", "CANCELLED"],
+                                "enum": ["SUCCESS", "FAILED"],
                                 "description": "Status must be one of the enum values"
                             },
                             "timestamp": {
@@ -71,7 +71,7 @@
                 { "order_id": 1 }
             </ext:keys>
             <ext:options>
-                { "name": "idx_order_id" }
+                { "name": "idx_order_id", unique: true }
             </ext:options>
         </ext:createIndex>
     </changeSet>
