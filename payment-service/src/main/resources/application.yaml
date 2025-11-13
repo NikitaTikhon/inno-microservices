@@ -13,6 +13,9 @@ spring:
     enabled: true
     change-log: db/changelog/db.changelog-master.xml
 
+  kafka:
+    bootstrap-servers: ${LOCAL_PAYMENT_ORDER_KAFKA_URL}
+
 resilience4j:
   circuitbreaker:
     instances:
