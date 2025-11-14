@@ -12,6 +12,7 @@ import com.innowise.orderservice.model.entity.Item;
 import com.innowise.orderservice.model.entity.Order;
 import com.innowise.orderservice.repository.ItemRepository;
 import com.innowise.orderservice.repository.OrderRepository;
+import com.innowise.orderservice.service.impl.KafkaServiceImpl;
 import com.innowise.orderservice.service.impl.OrderServiceImpl;
 import com.innowise.orderservice.service.impl.UserServiceRestClientImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +57,9 @@ class OrderServiceTest {
     private UserServiceRestClientImpl userServiceRestClient;
 
     @Mock
+    private KafkaServiceImpl kafkaService;
+
+    @Mock
     private OrderRepository orderRepository;
     @Mock
     private ItemRepository itemRepository;
@@ -76,6 +80,7 @@ class OrderServiceTest {
         when(userServiceRestClient.findUserById(userId)).thenReturn(userResponse);
         when(itemRepository.findByIdIn(anyList())).thenReturn(items);
         when(orderRepository.save(any())).thenReturn(savedOrder);
+        doNothing().when(kafkaService).sendCreateOrderEvent(any());
         when(orderMapper.orderToOrderResponse(any(), any())).thenReturn(expectedResponse);
 
         OrderResponse actualResponse = orderService.save(userId, orderRequest);

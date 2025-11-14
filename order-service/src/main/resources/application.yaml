@@ -22,6 +22,9 @@ spring:
   liquibase:
     contexts: dev
 
+  kafka:
+    bootstrap-servers: ${LOCAL_PAYMENT_ORDER_KAFKA_URL}
+
 resilience4j:
   circuitbreaker:
     configs:

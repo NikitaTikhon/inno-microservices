@@ -2,6 +2,7 @@ package com.innowise.orderservice.service.impl;
 
 import com.innowise.orderservice.exception.ResourceNotFoundException;
 import com.innowise.orderservice.mapper.OrderMapper;
+import com.innowise.orderservice.model.dto.CreateOrderEvent;
 import com.innowise.orderservice.model.dto.FilterRequest;
 import com.innowise.orderservice.model.dto.OrderItemRequest;
 import com.innowise.orderservice.model.dto.OrderRequest;
@@ -13,6 +14,7 @@ import com.innowise.orderservice.model.entity.Order;
 import com.innowise.orderservice.model.entity.OrderItem;
 import com.innowise.orderservice.repository.ItemRepository;
 import com.innowise.orderservice.repository.OrderRepository;
+import com.innowise.orderservice.service.KafkaService;
 import com.innowise.orderservice.service.OrderService;
 import com.innowise.orderservice.service.UserServiceRestClient;
 import com.innowise.orderservice.specification.OrderSpecification;
@@ -23,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final UserServiceRestClient userServiceRestClient;
+    private final KafkaService kafkaService;
 
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
@@ -51,6 +55,17 @@ public class OrderServiceImpl implements OrderService {
         updateOrderItems(order, orderRequest);
 
         orderRepository.save(order);
+
+        CreateOrderEvent createOrderEvent = CreateOrderEvent.builder()
+                .orderId(order.getId())
+                .userId(order.getUserId())
+                .paymentAmount(order.getOrderItems().stream()
+                        .map(orderItem -> orderItem.getItem().getPrice()
+                                .multiply(BigDecimal.valueOf(orderItem.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .build();
+
+        kafkaService.sendCreateOrderEvent(createOrderEvent);
 
         return orderMapper.orderToOrderResponse(order, userResponse);
     }
