@@ -45,7 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public PaymentResponse findByOrderId(Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.paymentNotFound(orderId)));
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.paymentNotFound("orderId", String.valueOf(orderId))));
 
         return paymentMapper.paymentToPaymentResponse(payment);
     }

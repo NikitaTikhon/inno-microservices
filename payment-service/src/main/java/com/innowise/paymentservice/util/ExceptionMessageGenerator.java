@@ -7,13 +7,12 @@ package com.innowise.paymentservice.util;
  */
 public class ExceptionMessageGenerator {
 
-    private static final String PAYMENT_NOT_FOUND = "Payment with id: %s not found";
+    private static final String PAYMENT_NOT_FOUND = "Payment with %s: %s not found";
 
-    private ExceptionMessageGenerator() {
-    }
+    private ExceptionMessageGenerator() {}
 
-    public static String paymentNotFound(Long id) {
-        return PAYMENT_NOT_FOUND.formatted(id);
+    public static String paymentNotFound(String field, String value) {
+        return PAYMENT_NOT_FOUND.formatted(field, value);
     }
 
 }
