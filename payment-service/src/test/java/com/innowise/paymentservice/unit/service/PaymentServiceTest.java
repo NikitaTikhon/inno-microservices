@@ -8,8 +8,8 @@ import com.innowise.paymentservice.model.dto.PaymentRequest;
 import com.innowise.paymentservice.model.dto.PaymentResponse;
 import com.innowise.paymentservice.model.projection.TotalAmountProjection;
 import com.innowise.paymentservice.repository.PaymentRepository;
+import com.innowise.paymentservice.service.impl.PaymentProcessorServiceImpl;
 import com.innowise.paymentservice.service.impl.PaymentServiceImpl;
-import com.innowise.paymentservice.service.impl.RandomNumberRestClientImpl;
 import com.innowise.paymentservice.util.ExceptionMessageGenerator;
 import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
@@ -46,7 +46,7 @@ class PaymentServiceTest {
     private PaymentServiceImpl paymentService;
 
     @Mock
-    private RandomNumberRestClientImpl randomNumberRestClient;
+    private PaymentProcessorServiceImpl paymentProcessorService;
 
     @Mock
     private PaymentRepository paymentRepository;
@@ -58,13 +58,12 @@ class PaymentServiceTest {
     @DisplayName("Should create payment with SUCCESS status when random number is even")
     void save_ShouldCreatePaymentWithSuccess_WhenRandomNumberIsEven() {
         PaymentRequest paymentRequest = createPaymentRequest();
-        Long randomNumber = 42L;
         ObjectId paymentId = new ObjectId();
         Payment savedPayment = createPayment(paymentId, paymentRequest.getOrderId(), PaymentStatus.SUCCESS);
         PaymentResponse expectedResponse = createPaymentResponse(paymentId.toString(), 
                 paymentRequest.getOrderId(), PaymentStatus.SUCCESS);
 
-        when(randomNumberRestClient.getRandomNumber()).thenReturn(randomNumber);
+        when(paymentProcessorService.processPayment()).thenReturn(PaymentStatus.SUCCESS);
         when(paymentMapper.paymentRequestToPayment(paymentRequest)).thenReturn(new Payment());
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
         when(paymentMapper.paymentToPaymentResponse(savedPayment)).thenReturn(expectedResponse);
@@ -82,7 +81,7 @@ class PaymentServiceTest {
         Payment capturedPayment = paymentCaptor.getValue();
         assertThat(capturedPayment.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
 
-        verify(randomNumberRestClient).getRandomNumber();
+        verify(paymentProcessorService).processPayment();
         verify(paymentMapper).paymentRequestToPayment(paymentRequest);
         verify(paymentMapper).paymentToPaymentResponse(savedPayment);
     }
