@@ -8,9 +8,11 @@ import com.innowise.paymentservice.model.dto.PaymentRequest;
 import com.innowise.paymentservice.model.dto.PaymentResponse;
 import com.innowise.paymentservice.model.projection.TotalAmountProjection;
 import com.innowise.paymentservice.repository.PaymentRepository;
+import com.innowise.paymentservice.service.PaymentProcessorService;
 import com.innowise.paymentservice.service.PaymentService;
 import com.innowise.paymentservice.util.ExceptionMessageGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.Decimal128;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,22 +22,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    private final RandomNumberRestClientImpl randomNumberRestClient;
+    private final PaymentProcessorService paymentProcessorService;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
 
     @Override
     @Transactional
     public PaymentResponse save(PaymentRequest paymentRequest) {
-        PaymentStatus paymentStatus = randomNumberRestClient.getRandomNumber() % 2 == 0
-                ? PaymentStatus.SUCCESS
-                : PaymentStatus.FAILED;
-
         Payment payment = paymentMapper.paymentRequestToPayment(paymentRequest);
+
+        PaymentStatus paymentStatus = paymentProcessorService.processPayment();
         payment.setStatus(paymentStatus);
 
         return paymentMapper.paymentToPaymentResponse(paymentRepository.save(payment));

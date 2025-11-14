@@ -4,6 +4,7 @@ import com.innowise.paymentservice.exception.ExternalServiceException;
 import com.innowise.paymentservice.exception.ResourceNotFoundException;
 import com.innowise.paymentservice.service.RandomNumberRestClient;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class RandomNumberRestClientImpl implements RandomNumberRestClient {
 
@@ -22,7 +24,7 @@ public class RandomNumberRestClientImpl implements RandomNumberRestClient {
     }
 
     @Override
-    @CircuitBreaker(name = "random-number-api")
+    @CircuitBreaker(name = "random-number-api", fallbackMethod = "getRandomNumberFallback")
     public Long getRandomNumber() {
         List<Long> numbers = randomNumberRestClient.get()
                 .retrieve()
@@ -41,6 +43,11 @@ public class RandomNumberRestClientImpl implements RandomNumberRestClient {
         }
 
         return numbers.getFirst();
+    }
+
+    private Long getRandomNumberFallback(Throwable throwable) {
+        log.error("Random number API unavailable, using fallback. Reason: {}", throwable.getMessage());
+        return 1L;
     }
 
 }
