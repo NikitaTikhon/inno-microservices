@@ -34,4 +34,5 @@ resilience4j:
 services:
   random-number-api:
     uri: ${RANDOM_NUMBER_API_URI}
+    fallback-value: ${RANDOM_NUMBER_API_FALLBACK_VALUE}
 
