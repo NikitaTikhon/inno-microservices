@@ -2,10 +2,12 @@ package com.innowise.orderservice.config;
 
 import com.innowise.orderservice.model.dto.CreateOrderEvent;
 import com.innowise.orderservice.model.dto.CreatePaymentEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,8 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -40,11 +44,14 @@ import java.util.Map;
  * </ul>
  * <p>
  */
+@Slf4j
 @Configuration
 public class KafkaConfig {
 
     public static final String ORDER_CREATED_TOPIC = "order-service.orders.created";
     public static final String PAYMENT_CREATED_TOPIC = "payment-service.payments.created";
+    public static final String PAYMENT_CREATED_DLT_TOPIC = "payment-service.payments.created.DLT";
+
     public static final String ORDER_SERVICE_PAYMENT_CONSUMER_GROUP = "order-service-payment-events-consumer";
 
     @Value(value = "${spring.kafka.bootstrap-servers}")
@@ -67,28 +74,53 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, CreateOrderEvent> producerFactory() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
+    public NewTopic paymentDltTopic() {
+        return TopicBuilder.name(PAYMENT_CREATED_DLT_TOPIC)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 
+    @Bean
+    public ProducerFactory<String, CreateOrderEvent> producerFactory() {
+        Map<String, Object> props = getCommonProducerProperties();
         props.put(ProducerConfig.RETRIES_CONFIG, 10);
         props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 100);
         props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 120000);
         props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
-
-        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
-        props.put(ProducerConfig.ACKS_CONFIG, "all");
         props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
 
         return new DefaultKafkaProducerFactory<>(props);
     }
 
     @Bean
+    public ProducerFactory<String, CreatePaymentEvent> dltProducerFactory() {
+        Map<String, Object> props = getCommonProducerProperties();
+
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+    private Map<String, Object> getCommonProducerProperties() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
+
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+
+        return props;
+    }
+
+    @Bean
     public KafkaTemplate<String, CreateOrderEvent> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, CreatePaymentEvent> dltKafkaTemplate() {
+        return new KafkaTemplate<>(dltProducerFactory());
     }
 
     @Bean
@@ -112,13 +144,31 @@ public class KafkaConfig {
 
     @Bean
     public DefaultErrorHandler kafkaErrorHandler() {
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(
+                dltKafkaTemplate(),
+                (consumerRecord, exception) -> {
+                    log.error("Message processing failed after all retries. Sending to DLT. " +
+                                    "Topic: {}, Partition: {}, Offset: {}, Key: {}, Error: {}",
+                            consumerRecord.topic(),
+                            consumerRecord.partition(),
+                            consumerRecord.offset(),
+                            consumerRecord.key(),
+                            exception.getMessage(),
+                            exception);
+
+                    return new TopicPartition(PAYMENT_CREATED_DLT_TOPIC, consumerRecord.partition());
+                });
+
         ExponentialBackOff backOff = new ExponentialBackOff();
         backOff.setInitialInterval(1000L);
         backOff.setMultiplier(2.0);
         backOff.setMaxInterval(10000L);
         backOff.setMaxElapsedTime(60000L);
 
-        return new DefaultErrorHandler(backOff);
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, backOff);
+        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
+
+        return errorHandler;
     }
 
     @Bean
@@ -126,6 +176,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, CreatePaymentEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setCommonErrorHandler(kafkaErrorHandler());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
     }
