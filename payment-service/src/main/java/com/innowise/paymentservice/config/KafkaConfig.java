@@ -177,6 +177,7 @@ public class KafkaConfig {
         ConcurrentKafkaListenerContainerFactory<String, PaymentRequest> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setCommonErrorHandler(kafkaErrorHandler());
+        factory.getContainerProperties().setMissingTopicsFatal(false);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
