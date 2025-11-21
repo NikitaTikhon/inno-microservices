@@ -36,6 +36,7 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.liquibase.enabled", () -> "false");
         
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        registry.add("services.random-number-api.fallback-value", () -> 2);
     }
 
     protected static String getKafkaBootstrapServers() {

@@ -4,10 +4,12 @@ import com.innowise.paymentservice.exception.ResourceNotFoundException;
 import com.innowise.paymentservice.mapper.PaymentMapper;
 import com.innowise.paymentservice.model.PaymentStatus;
 import com.innowise.paymentservice.model.document.Payment;
+import com.innowise.paymentservice.model.dto.CreatePaymentEvent;
 import com.innowise.paymentservice.model.dto.PaymentRequest;
 import com.innowise.paymentservice.model.dto.PaymentResponse;
 import com.innowise.paymentservice.model.projection.TotalAmountProjection;
 import com.innowise.paymentservice.repository.PaymentRepository;
+import com.innowise.paymentservice.service.impl.OutboxEventServiceImpl;
 import com.innowise.paymentservice.service.impl.PaymentProcessorServiceImpl;
 import com.innowise.paymentservice.service.impl.PaymentServiceImpl;
 import com.innowise.paymentservice.util.ExceptionMessageGenerator;
@@ -34,6 +36,7 @@ import static com.innowise.paymentservice.util.PaymentUtil.createPayments;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -47,6 +50,9 @@ class PaymentServiceTest {
 
     @Mock
     private PaymentProcessorServiceImpl paymentProcessorService;
+
+    @Mock
+    private OutboxEventServiceImpl outboxEventService;
 
     @Mock
     private PaymentRepository paymentRepository;
@@ -65,6 +71,7 @@ class PaymentServiceTest {
 
         when(paymentProcessorService.processPayment()).thenReturn(PaymentStatus.SUCCESS);
         when(paymentMapper.paymentRequestToPayment(paymentRequest)).thenReturn(new Payment());
+        doNothing().when(outboxEventService).save(any(CreatePaymentEvent.class));
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
         when(paymentMapper.paymentToPaymentResponse(savedPayment)).thenReturn(expectedResponse);
 
