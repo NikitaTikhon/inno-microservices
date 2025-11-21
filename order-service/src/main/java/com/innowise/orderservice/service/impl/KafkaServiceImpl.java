@@ -8,6 +8,7 @@ import com.innowise.orderservice.model.dto.CreatePaymentEvent;
 import com.innowise.orderservice.model.entity.Order;
 import com.innowise.orderservice.repository.OrderRepository;
 import com.innowise.orderservice.service.KafkaService;
+import com.innowise.orderservice.util.EventValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -27,16 +28,13 @@ public class KafkaServiceImpl implements KafkaService {
     private final KafkaTemplate<String, CreateOrderEvent> kafkaTemplate;
 
     private final OrderRepository orderRepository;
+    private final EventValidator eventValidator;
 
     @Override
     @KafkaListener(topics = KafkaConfig.PAYMENT_CREATED_TOPIC, groupId = KafkaConfig.ORDER_SERVICE_PAYMENT_CONSUMER_GROUP)
     public void consumeCreatePaymentEvent(ConsumerRecord<String, CreatePaymentEvent> consumerRecord) {
         CreatePaymentEvent event = consumerRecord.value();
-        if (event == null) {
-            log.error("Failed to deserialize CreatePaymentEvent at partition={}, offset={}",
-                    consumerRecord.partition(), consumerRecord.offset());
-            throw new IllegalArgumentException("Invalid CreatePaymentEvent - cannot deserialize");
-        }
+        eventValidator.validate(event);
 
         Order order = findOrderOrSkip(event.getOrderId(), event.getStatus());
         if (order == null) {
