@@ -7,6 +7,7 @@ import com.innowise.paymentservice.model.dto.PaymentResponse;
 import com.innowise.paymentservice.service.KafkaService;
 import com.innowise.paymentservice.service.OutboxEventService;
 import com.innowise.paymentservice.service.PaymentService;
+import com.innowise.paymentservice.util.EventValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -26,16 +27,13 @@ public class KafkaServiceImpl implements KafkaService {
 
     private final PaymentService paymentService;
     private final OutboxEventService outboxEventService;
+    private final EventValidator eventValidator;
 
     @Override
     @KafkaListener(topics = KafkaConfig.ORDER_CREATED_TOPIC, groupId = KafkaConfig.PAYMENT_SERVICE_ORDER_CONSUMER_GROUP)
     public void consumeCreateOrderEvent(ConsumerRecord<String, PaymentRequest> consumerRecord) {
         PaymentRequest event = consumerRecord.value();
-        if (event == null) {
-            log.error("Failed to deserialize PaymentRequest at partition={}, offset={}",
-                    consumerRecord.partition(), consumerRecord.offset());
-            throw new IllegalArgumentException("Invalid PaymentRequest - cannot deserialize");
-        }
+        eventValidator.validate(event);
 
         if (handleExistingPayment(event.getOrderId())) {
             return;
