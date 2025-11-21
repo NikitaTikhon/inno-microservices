@@ -14,8 +14,8 @@ import com.innowise.orderservice.model.entity.Order;
 import com.innowise.orderservice.model.entity.OrderItem;
 import com.innowise.orderservice.repository.ItemRepository;
 import com.innowise.orderservice.repository.OrderRepository;
-import com.innowise.orderservice.service.KafkaService;
 import com.innowise.orderservice.service.OrderService;
+import com.innowise.orderservice.service.OutboxEventService;
 import com.innowise.orderservice.service.UserServiceRestClient;
 import com.innowise.orderservice.specification.OrderSpecification;
 import com.innowise.orderservice.util.ExceptionMessageGenerator;
@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final UserServiceRestClient userServiceRestClient;
-    private final KafkaService kafkaService;
 
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+    private final OutboxEventService outboxEventService;
 
     private final OrderMapper orderMapper;
 
@@ -65,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .build();
 
-        kafkaService.sendCreateOrderEvent(createOrderEvent);
+        outboxEventService.save(createOrderEvent);
 
         return orderMapper.orderToOrderResponse(order, userResponse);
     }
