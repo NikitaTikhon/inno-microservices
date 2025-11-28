@@ -47,7 +47,7 @@ class UserServiceRestClientTest {
     void findUserById_ShouldReturnUser_WhenUserExists() {
         Long userId = 1L;
         UserResponse expectedResponse = createUserResponse(userId);
-        String url = userServiceUrl + "/users/{userId}";
+        String url = userServiceUrl + "/api/v1/users/{userId}";
 
         when(userServiceRestTemplate.getForObject(url, UserResponse.class, userId))
                 .thenReturn(expectedResponse);
@@ -69,7 +69,7 @@ class UserServiceRestClientTest {
                 createUserResponse(2L),
                 createUserResponse(3L)
         );
-        String url = userServiceUrl + "/users?filter=ids&ids={ids}";
+        String url = userServiceUrl + "/api/v1/users?filter=ids&ids={ids}";
 
         when(userServiceRestTemplate.exchange(
                 eq(url),
