@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+  labels:
+    app: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      name: gateway-service
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+        - name: gateway-service
+          image: haof/gateway-service
+          ports:
+            - containerPort: 8084
+          env:
+            - name: USER_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: USER_SERVICE_URI
+                  name: service-config
+            - name: AUTHENTICATION_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: AUTHENTICATION_SERVICE_URI
+                  name: service-config
+            - name: ORDER_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: ORDER_SERVICE_URI
+                  name: service-config
+            - name: PAYMENT_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: PAYMENT_SERVICE_URI
+                  name: service-config
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: jwt-secret-key
+                  name: token-secret
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      
