@@ -17,7 +17,7 @@ import org.wiremock.spring.EnableWireMock;
 @Testcontainers
 @ActiveProfiles("test")
 @EnableWireMock({
-        @ConfigureWireMock(name = "user-service", baseUrlProperties = "user-service.url")
+        @ConfigureWireMock(name = "user-service", baseUrlProperties = "services.user-service.uri")
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BaseIntegrationTest {

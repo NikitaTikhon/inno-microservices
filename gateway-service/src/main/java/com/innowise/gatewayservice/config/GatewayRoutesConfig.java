@@ -2,10 +2,15 @@ package com.innowise.gatewayservice.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.Buildable;
+import org.springframework.cloud.gateway.route.builder.PredicateSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.function.Function;
 
 /**
  * Configuration class for Gateway routes.
@@ -23,6 +28,9 @@ public class GatewayRoutesConfig {
 
     @Value("${services.order-service.uri}")
     private String orderServiceUri;
+
+    @Value("${services.payment-service.uri}")
+    private String paymentServiceUri;
 
     private final JwtAuthenticationGatewayFilter jwtAuthenticationGatewayFilter;
 
@@ -57,7 +65,20 @@ public class GatewayRoutesConfig {
                                 .apply(new JwtAuthenticationGatewayFilter.Config())))
                         .uri(orderServiceUri)
                 )
+                .route(createActuatorRoute("user-service", userServiceUri))
+                .route(createActuatorRoute("authentication-service", authenticationServiceUri))
+                .route(createActuatorRoute("order-service", orderServiceUri))
+                .route(createActuatorRoute("payment-service", paymentServiceUri))
                 .build();
+    }
+
+    private Function<PredicateSpec, Buildable<Route>> createActuatorRoute(String serviceName, String serviceUri) {
+        return route -> route
+                .path("/actuator/" + serviceName + "/**")
+                .filters(f -> f.rewritePath(
+                        "/actuator/" + serviceName + "/(?<segment>.*)",
+                        "/actuator/${segment}"))
+                .uri(serviceUri);
     }
 
 }

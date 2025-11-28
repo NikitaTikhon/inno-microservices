@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: payment-order-kafka
+spec:
+  serviceName: payment-order-kafka
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-order-kafka
+  template:
+    metadata:
+      labels:
+        app: payment-order-kafka
+    spec:
+      containers:
+        - name: payment-order-kafka
+          image: apache/kafka:4.0.1
+          ports:
+            - containerPort: 9092
+              name: kafka
+            - containerPort: 9093
+              name: external
+            - containerPort: 9094
+              name: controller
+          env:
+            - name: KAFKA_NODE_ID
+              value: "1"
+            - name: KAFKA_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093,CONTROLLER://0.0.0.0:9094"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://payment-order-kafka:9092,EXTERNAL://localhost:9093"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT"
+            - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+              value: "1@localhost:9094"
+            - name: KAFKA_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: CLUSTER_ID
+              value: "MkU3OEVBNTcwNTJENDM2Qk"
+          volumeMounts:
+            - name: kafka-storage
+              mountPath: /var/lib/kafka/data
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+              ephemeral-storage: "2Gi"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+              ephemeral-storage: "5Gi"
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

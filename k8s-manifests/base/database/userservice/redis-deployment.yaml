@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-redis
+  labels:
+    app: user-service-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-redis
+  template:
+    metadata:
+      name: user-service-redis
+      labels:
+        app: user-service-redis
+    spec:
+      containers:
+        - name: user-service-redis
+          image: redis:7.4
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+              ephemeral-storage: "500Mi"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+              ephemeral-storage: "1Gi"

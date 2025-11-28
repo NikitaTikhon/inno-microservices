@@ -58,7 +58,7 @@ class UserServiceRestClientIT extends BaseIntegrationTest {
         assertThat(response.getName()).isEqualTo("John Doe");
         assertThat(response.getEmail()).isEqualTo("john@example.com");
 
-        verify(getRequestedFor(urlEqualTo("/users/" + userId)));
+        verify(getRequestedFor(urlEqualTo("/api/v1/users/" + userId)));
     }
 
     @Test
@@ -71,7 +71,7 @@ class UserServiceRestClientIT extends BaseIntegrationTest {
         assertThatThrownBy(() -> userServiceRestClient.findUserById(userId))
                 .isInstanceOf(ResourceNotFoundException.class);
 
-        verify(getRequestedFor(urlEqualTo("/users/" + userId)));
+        verify(getRequestedFor(urlEqualTo("/api/v1/users/" + userId)));
     }
 
     @Test
@@ -91,7 +91,7 @@ class UserServiceRestClientIT extends BaseIntegrationTest {
                 .extracting(UserResponse::getId)
                 .containsExactlyInAnyOrder(1L, 2L);
 
-        verify(getRequestedFor(urlPathEqualTo("/users"))
+        verify(getRequestedFor(urlPathEqualTo("/api/v1/users"))
                 .withQueryParam("filter", equalTo("ids"))
                 .withQueryParam("ids", matching(".*")));
     }

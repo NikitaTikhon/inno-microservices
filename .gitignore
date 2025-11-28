@@ -33,3 +33,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Kubernetes Secrets ###
+k8s-manifests/base/secrets/*
+!k8s-manifests/base/secrets/*.example.yaml

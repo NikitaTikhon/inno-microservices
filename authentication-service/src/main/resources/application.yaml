@@ -46,3 +46,14 @@ security:
 services:
   user-service:
     uri: ${USER_SERVICE_URI}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

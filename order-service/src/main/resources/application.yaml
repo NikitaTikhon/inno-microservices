@@ -48,5 +48,17 @@ security:
   jwt:
     secret_key: ${JWT_SECRET_KEY}
 
-user-service:
-  url: ${LOCAL_USER_SERVICE_URL}
+services:
+  user-service:
+    uri: ${USER_SERVICE_URI}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

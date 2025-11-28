@@ -20,8 +20,8 @@ public class UserServiceRestClientImpl implements UserServiceRestClient {
 
     private final RestTemplate userServiceRestTemplate;
 
-    @Value("${user-service.url}")
-    private String userServiceUrl;
+    @Value("${services.user-service.uri}")
+    private String userServiceUri;
 
     public UserServiceRestClientImpl(@Qualifier("userServiceRestTemplate") RestTemplate userServiceRestTemplate) {
         this.userServiceRestTemplate = userServiceRestTemplate;
@@ -31,7 +31,7 @@ public class UserServiceRestClientImpl implements UserServiceRestClient {
     @CircuitBreaker(name = "user-service")
     public UserResponse findUserById(Long userId) {
         return userServiceRestTemplate.getForObject(
-                userServiceUrl + "/users/{userId}",
+                userServiceUri + "/api/v1/users/{userId}",
                 UserResponse.class,
                 userId
         );
@@ -44,7 +44,7 @@ public class UserServiceRestClientImpl implements UserServiceRestClient {
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
 
-        String url = userServiceUrl + "/users?filter=ids&ids={ids}";
+        String url = userServiceUri + "/api/v1/users?filter=ids&ids={ids}";
 
         ResponseEntity<List<UserResponse>> response = userServiceRestTemplate.exchange(
                 url,

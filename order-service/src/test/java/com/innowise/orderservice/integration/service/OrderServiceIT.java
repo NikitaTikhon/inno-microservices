@@ -303,7 +303,7 @@ class OrderServiceIT extends BaseIntegrationTest {
         assertThatThrownBy(() -> orderService.save(userId, orderRequest))
                 .isInstanceOf(ResourceNotFoundException.class);
 
-        verify(getRequestedFor(urlEqualTo("/users/" + userId))
+        verify(getRequestedFor(urlEqualTo("/api/v1/users/" + userId))
                 .withHeader("Authorization", matching("Bearer .*")));
     }
 

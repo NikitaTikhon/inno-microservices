@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: authentication-service-postgres
+spec:
+  serviceName: authentication-service-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication-service-postgres
+  template:
+    metadata:
+      labels:
+        app: authentication-service-postgres
+    spec:
+      containers:
+        - name: authentication-service-postgres
+          image: postgres:16.10
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: auth-db-name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: auth-db-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: auth-db-password
+          volumeMounts:
+            - name: authentication-service-postgres
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+              ephemeral-storage: "1Gi"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+              ephemeral-storage: "2Gi"
+  volumeClaimTemplates:
+    - metadata:
+        name: authentication-service-postgres
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
