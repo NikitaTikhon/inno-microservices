@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-order-kafka
+spec:
+  selector:
+    app: payment-order-kafka
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: payment-order-kafka
+    - port: 9093
+      targetPort: 9093
+      name: external
+  type: ClusterIP
