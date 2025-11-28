@@ -1,0 +1,90 @@
+package com.innowise.paymentservice.service.impl;
+
+import com.innowise.paymentservice.exception.ResourceNotFoundException;
+import com.innowise.paymentservice.mapper.PaymentMapper;
+import com.innowise.paymentservice.model.PaymentStatus;
+import com.innowise.paymentservice.model.document.Payment;
+import com.innowise.paymentservice.model.dto.CreatePaymentEvent;
+import com.innowise.paymentservice.model.dto.PaymentRequest;
+import com.innowise.paymentservice.model.dto.PaymentResponse;
+import com.innowise.paymentservice.model.projection.TotalAmountProjection;
+import com.innowise.paymentservice.repository.PaymentRepository;
+import com.innowise.paymentservice.service.OutboxEventService;
+import com.innowise.paymentservice.service.PaymentProcessorService;
+import com.innowise.paymentservice.service.PaymentService;
+import com.innowise.paymentservice.util.ExceptionMessageGenerator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.Decimal128;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PaymentServiceImpl implements PaymentService {
+
+    private final PaymentProcessorService paymentProcessorService;
+    private final OutboxEventService outboxEventService;
+    private final PaymentRepository paymentRepository;
+    private final PaymentMapper paymentMapper;
+
+    @Override
+    public PaymentResponse save(PaymentRequest paymentRequest) {
+        Payment payment = paymentMapper.paymentRequestToPayment(paymentRequest);
+
+        PaymentStatus paymentStatus = paymentProcessorService.processPayment();
+        payment.setStatus(paymentStatus);
+
+        Payment savePayment = paymentRepository.save(payment);
+        PaymentResponse paymentResponse = paymentMapper.paymentToPaymentResponse(savePayment);
+        CreatePaymentEvent event = CreatePaymentEvent.builder()
+                .orderId(paymentResponse.getOrderId())
+                .status(paymentResponse.getStatus())
+                .build();
+        outboxEventService.save(event);
+
+        return paymentResponse;
+    }
+
+    @Override
+    public PaymentResponse findByOrderId(Long orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionMessageGenerator.paymentNotFound("orderId", String.valueOf(orderId))));
+
+        return paymentMapper.paymentToPaymentResponse(payment);
+    }
+
+    @Override
+    public List<PaymentResponse> findByUserId(Long userId) {
+        List<Payment> payments = paymentRepository.findByUserId(userId);
+
+        return paymentMapper.paymentsToPaymentsResponse(payments);
+    }
+
+    @Override
+    public List<PaymentResponse> findByStatuses(List<PaymentStatus> statuses) {
+        List<Payment> payments = paymentRepository.findByStatusIn(statuses);
+
+        return paymentMapper.paymentsToPaymentsResponse(payments);
+    }
+
+    @Override
+    public BigDecimal findTotalAmount(LocalDateTime from, LocalDateTime to) {
+        Optional<TotalAmountProjection> totalAmountOpt = paymentRepository.findTotalAmount(from, to);
+
+        return totalAmountOpt.map(TotalAmountProjection::getTotal)
+                .map(Decimal128::bigDecimalValue)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    @Override
+    public boolean existsByOrderId(Long orderId) {
+        return paymentRepository.existsByOrderId(orderId);
+    }
+
+}

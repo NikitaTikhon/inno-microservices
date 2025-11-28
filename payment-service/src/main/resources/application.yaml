@@ -1,0 +1,38 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: payment-service
+
+  data:
+    mongodb:
+      uri: ${LOCAL_PAYMENT_MONGODB_URL}
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.xml
+
+  kafka:
+    bootstrap-servers: ${LOCAL_PAYMENT_ORDER_KAFKA_URL}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      randomNumberApi:
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 5
+        waitDurationInOpenState: 30000
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        recordExceptions:
+          - com.innowise.paymentservice.exception.ExternalServiceException
+          - org.springframework.web.client.ResourceAccessException
+
+services:
+  random-number-api:
+    uri: ${RANDOM_NUMBER_API_URI}
+    fallback-value: ${RANDOM_NUMBER_API_FALLBACK_VALUE}
+

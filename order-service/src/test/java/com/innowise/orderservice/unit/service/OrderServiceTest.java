@@ -3,6 +3,7 @@ package com.innowise.orderservice.unit.service;
 import com.innowise.orderservice.exception.ResourceNotFoundException;
 import com.innowise.orderservice.mapper.OrderMapper;
 import com.innowise.orderservice.model.OrderStatus;
+import com.innowise.orderservice.model.dto.CreateOrderEvent;
 import com.innowise.orderservice.model.dto.FilterRequest;
 import com.innowise.orderservice.model.dto.OrderRequest;
 import com.innowise.orderservice.model.dto.OrderResponse;
@@ -13,6 +14,7 @@ import com.innowise.orderservice.model.entity.Order;
 import com.innowise.orderservice.repository.ItemRepository;
 import com.innowise.orderservice.repository.OrderRepository;
 import com.innowise.orderservice.service.impl.OrderServiceImpl;
+import com.innowise.orderservice.service.impl.OutboxEventServiceImpl;
 import com.innowise.orderservice.service.impl.UserServiceRestClientImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,9 @@ class OrderServiceTest {
     private UserServiceRestClientImpl userServiceRestClient;
 
     @Mock
+    private OutboxEventServiceImpl outboxEventService;
+
+    @Mock
     private OrderRepository orderRepository;
     @Mock
     private ItemRepository itemRepository;
@@ -76,6 +81,7 @@ class OrderServiceTest {
         when(userServiceRestClient.findUserById(userId)).thenReturn(userResponse);
         when(itemRepository.findByIdIn(anyList())).thenReturn(items);
         when(orderRepository.save(any())).thenReturn(savedOrder);
+        doNothing().when(outboxEventService).save(any(CreateOrderEvent.class));
         when(orderMapper.orderToOrderResponse(any(), any())).thenReturn(expectedResponse);
 
         OrderResponse actualResponse = orderService.save(userId, orderRequest);

@@ -3,6 +3,7 @@ package com.innowise.orderservice.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.Collections;
  * Configures REST template for inter-service communication with JWT authentication.
  */
 @Configuration
+@EnableScheduling
 @RequiredArgsConstructor
 public class ServiceConfig {
 
