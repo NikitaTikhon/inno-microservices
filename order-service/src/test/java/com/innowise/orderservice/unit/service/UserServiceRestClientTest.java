@@ -35,11 +35,11 @@ class UserServiceRestClientTest {
     @Mock
     private RestTemplate userServiceRestTemplate;
 
-    private final String userServiceUrl = "http://localhost:8081";
+    private final String userServiceUri = "http://localhost:8081";
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(userServiceRestClient, "userServiceUrl", userServiceUrl);
+        ReflectionTestUtils.setField(userServiceRestClient, "userServiceUri", userServiceUri);
     }
 
     @Test
@@ -47,7 +47,7 @@ class UserServiceRestClientTest {
     void findUserById_ShouldReturnUser_WhenUserExists() {
         Long userId = 1L;
         UserResponse expectedResponse = createUserResponse(userId);
-        String url = userServiceUrl + "/users/{userId}";
+        String url = userServiceUri + "/api/v1/users/{userId}";
 
         when(userServiceRestTemplate.getForObject(url, UserResponse.class, userId))
                 .thenReturn(expectedResponse);
@@ -69,7 +69,7 @@ class UserServiceRestClientTest {
                 createUserResponse(2L),
                 createUserResponse(3L)
         );
-        String url = userServiceUrl + "/users?filter=ids&ids={ids}";
+        String url = userServiceUri + "/api/v1/users?filter=ids&ids={ids}";
 
         when(userServiceRestTemplate.exchange(
                 eq(url),

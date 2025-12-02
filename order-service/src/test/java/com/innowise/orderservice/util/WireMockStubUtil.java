@@ -19,7 +19,7 @@ public class WireMockStubUtil {
     public static void stubUserServiceFindById(Long userId, String name, String email) {
         String json = buildUserJson(userId, name, email);
 
-        stubFor(get(urlEqualTo("/users/" + userId))
+        stubFor(get(urlEqualTo("/api/v1/users/" + userId))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -27,7 +27,7 @@ public class WireMockStubUtil {
     }
 
     public static void stubUserServiceNotFound(Long userId) {
-        stubFor(get(urlEqualTo("/users/" + userId))
+        stubFor(get(urlEqualTo("/api/v1/users/" + userId))
                 .willReturn(aResponse()
                         .withStatus(404)
                         .withHeader("Content-Type", "application/json")
@@ -38,7 +38,7 @@ public class WireMockStubUtil {
         try {
             String json = objectMapper.writeValueAsString(users);
 
-            stubFor(get(urlPathEqualTo("/users"))
+            stubFor(get(urlPathEqualTo("/api/v1/users"))
                     .withQueryParam("filter", equalTo("ids"))
                     .withQueryParam("ids", matching(".*"))
                     .willReturn(aResponse()
