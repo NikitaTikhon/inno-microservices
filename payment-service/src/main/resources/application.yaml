@@ -36,3 +36,13 @@ services:
     uri: ${RANDOM_NUMBER_API_URI}
     fallback-value: ${RANDOM_NUMBER_API_FALLBACK_VALUE}
 
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

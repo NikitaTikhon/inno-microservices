@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  labels:
+    app: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      name: payment-service
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: haof/payment-service
+          ports:
+            - containerPort: 8085
+          env:
+            - name: USER_SERVICE_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: service-config
+                  key: USER_SERVICE_URI
+            - name: SPRING_KAFKA_BOOTSTRAPSERVERS
+              value: "payment-order-kafka:9092"
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  key: mongodb-uri
+                  name: mongodb-secret
+            - name: RANDOM_NUMBER_API_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: service-config
+                  key: RANDOM_NUMBER_API_URI
+            - name: RANDOM_NUMBER_API_FALLBACK_VALUE
+              valueFrom:
+                configMapKeyRef:
+                  name: service-config
+                  key: RANDOM_NUMBER_API_FALLBACK_VALUE
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8085
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
